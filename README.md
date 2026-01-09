@@ -56,6 +56,14 @@ This implementation treats the Asset Administration Shell (AAS) not as a passive
 5. **skill-broker** downgrades capabilities in AAS (Grade A → not assured)
 6. **Dispatcher** queries again and routes precision work to `milling-02` automatically
 
+## Screenshots
+
+| Scenario | Preview |
+| --- | --- |
+| Fault injected (health drops) | ![Fault injected](docs/screenshots/03_fault_injected.png) |
+| Capability downgraded (not available) | ![Capability downgraded](docs/screenshots/04_capability_downgraded.png) |
+| Job rerouted to milling-02 | ![Job rerouted](docs/screenshots/05_job_rerouted.png) |
+
 This demonstrates **resilience through adaptation** rather than failure through alarms.
 
 ## Quick Start

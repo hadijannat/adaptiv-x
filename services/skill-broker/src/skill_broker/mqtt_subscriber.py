@@ -9,8 +9,9 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from datetime import datetime, timezone
-from typing import Any, Callable, Awaitable
+from collections.abc import Awaitable, Callable
+from datetime import UTC, datetime
+from typing import Any
 
 import paho.mqtt.client as mqtt
 from pydantic import BaseModel
@@ -66,7 +67,7 @@ class MQTTSubscriber:
                 if self._connected:
                     # Subscribe to health events
                     self._client.subscribe("adaptivx/health/#", qos=1)
-                    logger.info(f"Connected to MQTT and subscribed to health events")
+                    logger.info("Connected to MQTT and subscribed to health events")
                     return
                 await asyncio.sleep(0.1)
 
@@ -124,7 +125,7 @@ class MQTTSubscriber:
                 asset_id=payload.get("asset_id", ""),
                 health_index=payload.get("health_index", 100),
                 timestamp=datetime.fromisoformat(
-                    payload.get("timestamp", datetime.now(timezone.utc).isoformat())
+                    payload.get("timestamp", datetime.now(UTC).isoformat())
                 ),
             )
 

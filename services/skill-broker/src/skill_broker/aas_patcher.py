@@ -43,12 +43,24 @@ class AASPatcher:
             return f"urn:adaptivx:submodel:health:{asset_id}"
         return f"urn:adaptivx:submodel:capability:{asset_id}"
 
+    def _normalize_element_path(self, element_path: str) -> str:
+        """Strip submodel idShort prefix from the element path if present."""
+        if element_path.startswith("Capabilities/"):
+            element_path = element_path[len("Capabilities/") :]
+        elif element_path.startswith("Health/"):
+            element_path = element_path[len("Health/") :]
+        return element_path.replace("/", ".")
+
     async def _patch_submodel_element(
         self, submodel_id: str, element_path: str, value: str
     ) -> None:
         encoded_sm_id = self._encode_id(submodel_id)
-        encoded_path = quote(element_path, safe="")
-        url = f"{self.aas_env_url}/submodels/{encoded_sm_id}/submodel-elements/{encoded_path}/$value"
+        normalized_path = self._normalize_element_path(element_path)
+        encoded_path = quote(normalized_path, safe="")
+        url = (
+            f"{self.aas_env_url}/submodels/{encoded_sm_id}"
+            f"/submodel-elements/{encoded_path}/$value"
+        )
 
         response = await self._client.patch(
             url,
@@ -61,8 +73,12 @@ class AASPatcher:
         self, submodel_id: str, element_path: str
     ) -> str | None:
         encoded_sm_id = self._encode_id(submodel_id)
-        encoded_path = quote(element_path, safe="")
-        url = f"{self.aas_env_url}/submodels/{encoded_sm_id}/submodel-elements/{encoded_path}/$value"
+        normalized_path = self._normalize_element_path(element_path)
+        encoded_path = quote(normalized_path, safe="")
+        url = (
+            f"{self.aas_env_url}/submodels/{encoded_sm_id}"
+            f"/submodel-elements/{encoded_path}/$value"
+        )
 
         response = await self._client.get(url)
         response.raise_for_status()
@@ -76,7 +92,8 @@ class AASPatcher:
 
         Args:
             asset_id: Asset identifier (e.g., "milling-01")
-            element_path: Path to element (e.g., "Capabilities/ProcessCapability:Milling/AssuranceState")
+            element_path: Path to element
+                (e.g., "Capabilities/ProcessCapability:Milling/AssuranceState")
             value: New value to set
         """
         try:

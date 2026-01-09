@@ -68,7 +68,7 @@ class PolicyEngine:
             return
 
         try:
-            with open(policy_path) as f:
+            with policy_path.open() as f:
                 data = yaml.safe_load(f)
 
             self._rules = []

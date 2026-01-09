@@ -16,17 +16,17 @@ from __future__ import annotations
 import logging
 import re
 import uuid
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import AsyncGenerator
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
+from job_dispatcher.bidding import Bid, BiddingService, Contract
 from job_dispatcher.capability_query import CapabilityQueryService
 from job_dispatcher.config import Settings
-from job_dispatcher.bidding import BiddingService, Bid, Contract
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -189,8 +189,11 @@ async def dispatch_job(request: JobRequest) -> JobAssignment:
             job_id=request.job_id,
             assigned_asset=selected.asset_id,
             candidates_evaluated=len(evaluated),
-            selection_reason=f"Lowest energy cost ({selected.energy_cost_per_part} kWh) among {len(eligible_assets)} eligible assets",
-            timestamp=datetime.now(timezone.utc),
+            selection_reason=(
+                f"Lowest energy cost ({selected.energy_cost_per_part} kWh) "
+                f"among {len(eligible_assets)} eligible assets"
+            ),
+            timestamp=datetime.now(tz=UTC),
             candidates=evaluated,
         )
     else:
@@ -199,7 +202,7 @@ async def dispatch_job(request: JobRequest) -> JobAssignment:
             assigned_asset=None,
             candidates_evaluated=len(evaluated),
             selection_reason="No eligible assets found matching requirements",
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(tz=UTC),
             candidates=evaluated,
         )
 
@@ -319,11 +322,14 @@ def _evaluate_candidate(
     if requirements.tolerance_class and tolerance != requirements.tolerance_class:
         required_tol = _parse_tolerance_mm(requirements.tolerance_class)
         candidate_tol = _parse_tolerance_mm(tolerance)
-        if required_tol is not None and candidate_tol is not None:
-            if candidate_tol > required_tol:
-                rejection_reasons.append(
-                    f"Tolerance {tolerance} > required {requirements.tolerance_class}"
-                )
+        if (
+            required_tol is not None
+            and candidate_tol is not None
+            and candidate_tol > required_tol
+        ):
+            rejection_reasons.append(
+                f"Tolerance {tolerance} > required {requirements.tolerance_class}"
+            )
 
     eligible = len(rejection_reasons) == 0
 

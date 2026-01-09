@@ -18,9 +18,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
-from typing import AsyncGenerator
+from datetime import UTC, datetime
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
@@ -28,7 +28,7 @@ from pydantic import BaseModel, Field
 from skill_broker.aas_patcher import AASPatcher
 from skill_broker.config import Settings
 from skill_broker.mqtt_subscriber import MQTTSubscriber
-from skill_broker.policy_engine import PolicyEngine, PolicyAction
+from skill_broker.policy_engine import PolicyAction, PolicyEngine
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -52,7 +52,7 @@ class HealthEvent(BaseModel):
 
     asset_id: str
     health_index: int = Field(..., ge=0, le=100)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class CapabilityPatch(BaseModel):
@@ -178,7 +178,7 @@ async def _evaluate_and_apply(asset_id: str, health_index: int) -> list[PolicyAc
 
             # Audit log
             entry = AuditLogEntry(
-                timestamp=datetime.now(timezone.utc),
+                timestamp=datetime.now(UTC),
                 asset_id=asset_id,
                 action="PATCH",
                 path=action.path,
@@ -243,7 +243,7 @@ async def evaluate_health(event: HealthEvent) -> PolicyEvaluationResult:
         asset_id=event.asset_id,
         health_index=event.health_index,
         actions_taken=[{"path": a.path, "value": a.value} for a in actions],
-        timestamp=datetime.now(timezone.utc),
+        timestamp=datetime.now(UTC),
     )
 
 
@@ -259,7 +259,7 @@ async def patch_capability(patch: CapabilityPatch) -> dict[str, str]:
 
         # Audit log
         entry = AuditLogEntry(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             asset_id=patch.asset_id,
             action="MANUAL_PATCH",
             path=patch.path,

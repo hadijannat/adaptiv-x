@@ -14,7 +14,7 @@ from __future__ import annotations
 import logging
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel
@@ -74,7 +74,7 @@ class BiddingService:
     3. Award - Winner selection and contract creation
     """
 
-    def __init__(self, query_service: "CapabilityQueryService") -> None:
+    def __init__(self, query_service: CapabilityQueryService) -> None:
         self._query_service = query_service
         self._rfbs: dict[str, RequestForBids] = {}
 
@@ -99,7 +99,7 @@ class BiddingService:
                 "tolerance_class": requirements.tolerance_class,
                 "assurance_required": requirements.assurance_required,
             },
-            created_at=datetime.now(timezone.utc),
+            created_at=datetime.now(UTC),
         )
 
         # Simulate immediate bid collection from all assets
@@ -155,7 +155,7 @@ class BiddingService:
             lead_time_minutes=base_lead_time,
             risk_score=round(risk, 2),
             assurance_state=assurance,
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
         )
 
     async def get_bids(self, rfb_id: str) -> list[Bid]:
@@ -208,8 +208,11 @@ class BiddingService:
             awarded_to=best_bid.asset_id,
             total_cost=best_bid.energy_cost,
             lead_time_minutes=best_bid.lead_time_minutes,
-            awarded_at=datetime.now(timezone.utc),
-            rationale=f"Lowest weighted score ({score_bid(best_bid):.2f}) with assurance={best_bid.assurance_state}",
+            awarded_at=datetime.now(UTC),
+            rationale=(
+                f"Lowest weighted score ({score_bid(best_bid):.2f}) "
+                f"with assurance={best_bid.assurance_state}"
+            ),
         )
 
         rfb.status = "awarded"

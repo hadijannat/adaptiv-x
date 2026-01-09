@@ -7,9 +7,9 @@ Calls adaptiv-monitor for assessment and skill-broker for policy evaluation.
 from __future__ import annotations
 
 import logging
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import AsyncGenerator
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
@@ -31,7 +31,9 @@ class FaultInjectionRequest(BaseModel):
     omega: float = Field(default=150.0, ge=0, description="Spindle speed [rad/s]")
     load: float = Field(default=800.0, ge=0, description="Cutting load [N]")
     wear: float = Field(default=0.0, ge=0, le=1, description="Wear level [0-1]")
-    evaluate_policy: bool = Field(default=True, description="Trigger skill-broker policy evaluation")
+    evaluate_policy: bool = Field(
+        default=True, description="Trigger skill-broker policy evaluation"
+    )
 
 
 class HealthAssessment(BaseModel):
