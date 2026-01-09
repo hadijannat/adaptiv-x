@@ -17,6 +17,19 @@ def encode_id(identifier: str) -> str:
     """Base64-URL encode an identifier for AAS API paths."""
     return urlsafe_b64encode(identifier.encode()).decode().rstrip("=")
 
+
+def normalize_list(payload):
+    if isinstance(payload, dict):
+        result = payload.get("result")
+        if isinstance(result, list):
+            return result
+        if isinstance(result, dict):
+            items = result.get("items")
+            if isinstance(items, list):
+                return items
+    return payload if isinstance(payload, list) else []
+
+
 @pytest_asyncio.fixture
 async def client() -> httpx.AsyncClient:
     async with httpx.AsyncClient(base_url=AAS_ENV_URL, timeout=10.0) as client:
@@ -27,7 +40,7 @@ async def test_aas_discovery(client):
     """Verify that expected AAS shells are present."""
     response = await client.get("/shells")
     assert response.status_code == 200
-    shells = response.json()
+    shells = normalize_list(response.json())
     
     # We expect at least milling-01 and milling-02
     ids = [s.get("idShort") for s in shells]
@@ -80,7 +93,7 @@ async def test_semantic_id_consistency(client):
     """Check that semantic IDs across assets are consistent."""
     response = await client.get("/submodels")
     assert response.status_code == 200
-    all_sm = response.json()
+    all_sm = normalize_list(response.json())
     
     health_sms = [sm for sm in all_sm if "health" in sm.get("id", "").lower()]
     capability_sms = [sm for sm in all_sm if "capability" in sm.get("id", "").lower()]
