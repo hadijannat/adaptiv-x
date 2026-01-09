@@ -12,7 +12,7 @@ class Settings(BaseSettings):
 
     # Service settings
     host: str = "0.0.0.0"  # noqa: S104
-    port: int = 8000
+    port: int = 8002
     debug: bool = False
 
     # BaSyx endpoints

@@ -211,10 +211,14 @@ async def _periodic_evaluation() -> None:
             continue
 
         for asset_id in assets:
-            health_index = await aas_patcher.get_health_index(asset_id)
-            if health_index is None:
+            try:
+                health_index = await aas_patcher.get_health_index(asset_id)
+                if health_index is None:
+                    continue
+                await _evaluate_and_apply(asset_id, health_index)
+            except Exception as exc:
+                logger.error("Failed to evaluate asset %s: %s", asset_id, exc)
                 continue
-            await _evaluate_and_apply(asset_id, health_index)
 
 
 # ============================================================================

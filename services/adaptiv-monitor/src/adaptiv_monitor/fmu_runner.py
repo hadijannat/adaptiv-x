@@ -108,9 +108,9 @@ class FMURunner:
         if not fmu_url:
             logger.warning(f"No FMU URL found for {asset_id}")
             # Try default location
-            fmu_url = (
-                f"http://{self.minio_endpoint}/{self.minio_bucket}/bearing_wear.fmu"
-            )
+            fmu_url = f"/{self.minio_bucket}/bearing_wear.fmu"
+
+        fmu_url = self._resolve_fmu_url(fmu_url)
 
         # Download FMU
         try:
@@ -128,6 +128,16 @@ class FMURunner:
         except Exception as e:
             logger.error(f"Failed to download FMU from {fmu_url}: {e}")
             return None
+
+    def _resolve_fmu_url(self, fmu_url: str) -> str:
+        """Resolve FMU URL from relative or absolute values."""
+        if fmu_url.startswith(("http://", "https://")):
+            return fmu_url
+
+        scheme = "https" if self.minio_secure else "http"
+        if fmu_url.startswith("/"):
+            return f"{scheme}://{self.minio_endpoint}{fmu_url}"
+        return f"{scheme}://{self.minio_endpoint}/{fmu_url}"
 
     def _fallback_calculation(
         self, omega: float, load: float, wear: float

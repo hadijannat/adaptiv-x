@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     """Service configuration loaded from environment variables."""
 
     host: str = "0.0.0.0"  # noqa: S104
-    port: int = 8000
+    port: int = 8003
     debug: bool = False
 
     aas_registry_url: str = "http://localhost:4000"

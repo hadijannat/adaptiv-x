@@ -2,6 +2,7 @@
 Configuration settings for Adaptiv-Monitor service.
 """
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings
 
 
@@ -12,6 +13,7 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"  # noqa: S104
     port: int = 8011
     debug: bool = False
+    app_env: str = "dev"
 
     # BaSyx endpoints
     aas_environment_url: str = "http://localhost:4001"
@@ -24,8 +26,8 @@ class Settings(BaseSettings):
 
     # MinIO (for FMU storage)
     minio_endpoint: str = "localhost:9000"
-    minio_access_key: str = "adaptivx"
-    minio_secret_key: str = "adaptivx123"  # noqa: S105
+    minio_access_key: str | None = None
+    minio_secret_key: str | None = None
     minio_bucket: str = "adaptivx-fmu"
     minio_secure: bool = False
 
@@ -42,3 +44,10 @@ class Settings(BaseSettings):
     physics_weight: float = 0.4
 
     model_config = {"env_prefix": "", "case_sensitive": False}
+
+    @model_validator(mode="after")
+    def _validate_minio_credentials(self) -> "Settings":
+        if self.app_env.lower() == "prod":
+            if not self.minio_access_key or not self.minio_secret_key:
+                raise ValueError("MINIO_ACCESS_KEY and MINIO_SECRET_KEY must be set")
+        return self

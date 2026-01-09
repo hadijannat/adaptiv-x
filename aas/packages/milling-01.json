@@ -268,7 +268,7 @@
                                             "modelType": "File",
                                             "idShort": "DigitalFile",
                                             "contentType": "application/zip",
-                                            "value": "http://minio:9000/adaptivx-fmu/bearing_wear.fmu"
+                                            "value": "/adaptivx-fmu/bearing_wear.fmu"
                                         }
                                     ]
                                 }
