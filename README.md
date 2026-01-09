@@ -80,7 +80,7 @@ This demonstrates **resilience through adaptation** rather than failure through 
 
 ```bash
 # Clone the repository
-git clone https://github.com/adaptiv-x/self-healing-aas.git
+git clone https://github.com/hadijannat/adaptiv-x.git
 cd adaptiv-x
 
 # Start infrastructure (BaSyx, registries, MQTT, MinIO)
@@ -159,7 +159,7 @@ If ports are already in use, Docker may remap host ports (check `docker ps`).
 ```
 adaptiv-x/
 ├── aas/                          # AAS artifacts
-│   ├── packages/                 # AASX packages (milling-01, milling-02)
+│   ├── packages/                 # AAS JSON/AASX packages (milling-01, milling-02)
 │   ├── submodels/               # Submodel templates
 │   │   ├── health/              # Health monitoring (custom draft)
 │   │   ├── capability/          # Capability description (custom draft)
@@ -173,8 +173,8 @@ adaptiv-x/
 │   ├── adaptiv-monitor/         # Hybrid AI health monitoring
 │   ├── skill-broker/            # Semantic capability reasoning
 │   ├── job-dispatcher/          # Production routing + bidding
-│   ├── fault-injector/          # Demo fault injection
-│   └── dashboard/               # React + Redux + MUI
+│   └── fault-injector/          # Demo fault injection
+├── dashboard/                   # React + Redux + MUI
 ├── deploy/                      # Deployment artifacts
 │   ├── compose/                 # Docker Compose (local dev)
 │   └── k8s/                     # Kubernetes Helm charts

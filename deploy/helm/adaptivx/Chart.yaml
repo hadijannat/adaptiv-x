@@ -11,9 +11,9 @@ keywords:
   - self-healing
 maintainers:
   - name: Adaptiv-X Team
-home: https://github.com/adaptiv-x/self-healing-aas
+home: https://github.com/hadijannat/adaptiv-x
 sources:
-  - https://github.com/adaptiv-x/self-healing-aas
+  - https://github.com/hadijannat/adaptiv-x
 dependencies:
   - name: mosquitto
     version: "2.x.x"

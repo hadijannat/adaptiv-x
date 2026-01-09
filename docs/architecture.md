@@ -67,6 +67,10 @@ Adaptiv-X implements a closed semantic control loop for Industrial Digital Twins
 3. Physics residual = |actual - expected| / expected
 4. Health fusion: confidence = 1 - (0.6 * anomaly + 0.4 * residual)
 
+**FMU responsibility**:
+- BaSyx stores the SimulationModels submodel and FMU reference.
+- `adaptiv-monitor` downloads the FMU and runs it locally with FMPy.
+
 **Output**:
 - HealthIndex (0-100)
 - HealthConfidence (0-1)

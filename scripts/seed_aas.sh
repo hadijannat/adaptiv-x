@@ -16,6 +16,7 @@ AAS_ENV_URL="${AAS_ENV_URL:-http://localhost:4001}"
 MINIO_ENDPOINT="${MINIO_ENDPOINT:-localhost:9000}"
 MINIO_USER="${MINIO_USER:-adaptivx}"
 MINIO_PASS="${MINIO_PASS:-adaptivx123}"
+AASX_ACCEPT_HEADER="application/asset-administration-shell-package"
 
 # Colors
 GREEN='\033[0;32m'
@@ -75,6 +76,19 @@ upload_aas_package() {
     fi
 }
 
+upload_aasx_package() {
+    local file=$1
+    local filename=$(basename "$file")
+
+    log_info "Uploading AASX package $filename via /upload..."
+    curl -sf -X POST "$AAS_ENV_URL/upload" \
+        -H "Accept: ${AASX_ACCEPT_HEADER}" \
+        -F "file=@${file}" > /dev/null 2>&1 || {
+        log_error "Failed to upload $filename via /upload"
+        return 1
+    }
+}
+
 upload_fmu() {
     local fmu_file="$FMU_DIR/bearing_wear.fmu"
     
@@ -109,12 +123,22 @@ main() {
         exit 1
     fi
     
-    # Upload AAS packages
-    for package in "$AAS_DIR"/*.json; do
+    # Upload AAS packages (prefer AASX if present)
+    local aasx_found=false
+    for package in "$AAS_DIR"/*.aasx; do
         if [ -f "$package" ]; then
-            upload_aas_package "$package"
+            aasx_found=true
+            upload_aasx_package "$package"
         fi
     done
+
+    if [ "$aasx_found" = false ]; then
+        for package in "$AAS_DIR"/*.json; do
+            if [ -f "$package" ]; then
+                upload_aas_package "$package"
+            fi
+        done
+    fi
     
     # Upload FMU
     upload_fmu
