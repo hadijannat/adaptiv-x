@@ -29,7 +29,7 @@ from aas_contract import (
 from aas_contract import (
     __version__ as contract_version,
 )
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from job_dispatcher.bidding import Bid, BiddingService, Contract
@@ -42,8 +42,6 @@ logger = logging.getLogger(__name__)
 
 # Global instances
 settings = Settings()
-query_service: CapabilityQueryService | None = None
-bidding_service: BiddingService | None = None
 
 
 # ============================================================================
@@ -122,8 +120,6 @@ job_history: list[JobAssignment] = []
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan for startup/shutdown."""
-    global query_service, bidding_service
-
     logger.info("Starting Job-Dispatcher service...")
 
     query_service = CapabilityQueryService(
@@ -133,13 +129,15 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     bidding_service = BiddingService(query_service)
 
+    app.state.query_service = query_service
+    app.state.bidding_service = bidding_service
+
     logger.info("Job-Dispatcher service started successfully")
 
     yield
 
     logger.info("Shutting down Job-Dispatcher service...")
-    if query_service:
-        await query_service.close()
+    await query_service.close()
 
 
 app = FastAPI(
@@ -174,7 +172,7 @@ async def debug_contract() -> dict[str, object]:
 
 
 @app.post("/dispatch", response_model=JobAssignment)
-async def dispatch_job(request: JobRequest) -> JobAssignment:
+async def dispatch_job(request: JobRequest, http_request: Request) -> JobAssignment:
     """
     Dispatch a job to the best available asset.
 
@@ -184,12 +182,10 @@ async def dispatch_job(request: JobRequest) -> JobAssignment:
     3. Filter by requirements (grade, tolerance, assurance)
     4. Select asset with lowest energy cost
     """
-    if not query_service:
-        raise HTTPException(status_code=503, detail="Service not initialized")
-
     logger.info(f"Dispatching job: {request.job_id} ({request.description})")
 
     # Get all candidates with their capability state
+    query_service: CapabilityQueryService = http_request.app.state.query_service
     candidates = await query_service.get_all_candidates()
 
     # Evaluate each candidate against requirements
@@ -233,15 +229,15 @@ async def dispatch_job(request: JobRequest) -> JobAssignment:
 
 
 @app.post("/bid/request")
-async def create_bid_request(request: BidRequest) -> dict[str, object]:
+async def create_bid_request(
+    request: BidRequest, http_request: Request
+) -> dict[str, object]:
     """
     Create a VDI/VDE 2193-inspired Request for Bids (RFB).
 
     This initiates the bidding process for a job.
     """
-    if not bidding_service:
-        raise HTTPException(status_code=503, detail="Service not initialized")
-
+    bidding_service: BiddingService = http_request.app.state.bidding_service
     rfb = await bidding_service.create_rfb(
         job_id=request.job_id,
         requirements=request.requirements,
@@ -257,16 +253,14 @@ async def create_bid_request(request: BidRequest) -> dict[str, object]:
 
 
 @app.get("/bid/{rfb_id}/bids")
-async def get_bids(rfb_id: str) -> list[Bid]:
+async def get_bids(rfb_id: str, http_request: Request) -> list[Bid]:
     """Get all bids for a Request for Bids."""
-    if not bidding_service:
-        raise HTTPException(status_code=503, detail="Service not initialized")
-
+    bidding_service: BiddingService = http_request.app.state.bidding_service
     return await bidding_service.get_bids(rfb_id)
 
 
 @app.post("/bid/{rfb_id}/award")
-async def award_contract(rfb_id: str) -> Contract:
+async def award_contract(rfb_id: str, http_request: Request) -> Contract:
     """
     Award contract to the best bidder.
 
@@ -275,9 +269,7 @@ async def award_contract(rfb_id: str) -> Contract:
     2. Lowest total cost (energy + risk)
     3. Fastest lead time as tiebreaker
     """
-    if not bidding_service:
-        raise HTTPException(status_code=503, detail="Service not initialized")
-
+    bidding_service: BiddingService = http_request.app.state.bidding_service
     contract = await bidding_service.award_contract(rfb_id)
     if not contract:
         raise HTTPException(status_code=404, detail="No valid bids found")
@@ -286,11 +278,9 @@ async def award_contract(rfb_id: str) -> Contract:
 
 
 @app.get("/candidates")
-async def list_candidates() -> list[AssetCandidate]:
+async def list_candidates(http_request: Request) -> list[AssetCandidate]:
     """List all available asset candidates with their capability states."""
-    if not query_service:
-        raise HTTPException(status_code=503, detail="Service not initialized")
-
+    query_service: CapabilityQueryService = http_request.app.state.query_service
     candidates = await query_service.get_all_candidates()
 
     # Default requirements for display

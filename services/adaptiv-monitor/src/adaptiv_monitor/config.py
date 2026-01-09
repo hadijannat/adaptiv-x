@@ -47,7 +47,8 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def _validate_minio_credentials(self) -> "Settings":
-        if self.app_env.lower() == "prod":
-            if not self.minio_access_key or not self.minio_secret_key:
-                raise ValueError("MINIO_ACCESS_KEY and MINIO_SECRET_KEY must be set")
+        if self.app_env.lower() == "prod" and (
+            not self.minio_access_key or not self.minio_secret_key
+        ):
+            raise ValueError("MINIO_ACCESS_KEY and MINIO_SECRET_KEY must be set")
         return self

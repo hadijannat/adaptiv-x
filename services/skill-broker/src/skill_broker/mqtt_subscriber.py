@@ -66,12 +66,31 @@ class MQTTSubscriber:
         except Exception as e:
             logger.warning(f"MQTT connection failed: {e}")
 
+    async def ensure_connected(self) -> None:
+        """Ensure MQTT connection is active (best-effort reconnect)."""
+        if self._connected:
+            return
+        if not self._client:
+            await self.connect()
+            return
+
+        try:
+            self._client.connect_async(self.broker_host, self.broker_port)
+            for _ in range(20):
+                if self._connected:
+                    self._client.subscribe("adaptivx/health/#", qos=1)
+                    return
+                await asyncio.sleep(0.1)
+        except Exception as e:
+            logger.debug("MQTT reconnect failed: %s", e)
+
     async def disconnect(self) -> None:
         """Disconnect from the MQTT broker."""
         if self._client:
             self._client.loop_stop()
             self._client.disconnect()
             self._connected = False
+            self._client = None
 
     def _on_connect(
         self,

@@ -27,15 +27,17 @@ class FMURunner:
     def __init__(
         self,
         minio_endpoint: str = "localhost:9000",
-        minio_access_key: str = "adaptivx",
-        minio_secret_key: str = "",
+        minio_access_key: str | None = None,
+        minio_secret_key: str | None = None,
         minio_bucket: str = "adaptivx-fmu",
+        minio_secure: bool = False,
         cache_dir: str | None = None,
     ) -> None:
         self.minio_endpoint = minio_endpoint
-        self.minio_access_key = minio_access_key
-        self.minio_secret_key = minio_secret_key
+        self.minio_access_key = minio_access_key or ""
+        self.minio_secret_key = minio_secret_key or ""
         self.minio_bucket = minio_bucket
+        self.minio_secure = minio_secure
         self._cache_dir = (
             Path(cache_dir) if cache_dir else Path(tempfile.gettempdir()) / "fmu_cache"
         )

@@ -27,7 +27,7 @@ from aas_contract import (
 from aas_contract import (
     __version__ as contract_version,
 )
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from adaptiv_monitor.basyx_client import BasyxClient
@@ -41,13 +41,7 @@ from adaptiv_monitor.mqtt_client import MQTTClient
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Global instances
 settings = Settings()
-basyx_client: BasyxClient | None = None
-fmu_runner: FMURunner | None = None
-anomaly_detector: AnomalyDetector | None = None
-mqtt_client: MQTTClient | None = None
-health_fusion: HealthFusion | None = None
 
 
 # ============================================================================
@@ -96,8 +90,6 @@ class TriggerRequest(BaseModel):
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan for startup/shutdown."""
-    global basyx_client, fmu_runner, anomaly_detector, mqtt_client, health_fusion
-
     logger.info("Starting Adaptiv-Monitor service...")
 
     # Initialize components
@@ -112,6 +104,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         minio_access_key=settings.minio_access_key,
         minio_secret_key=settings.minio_secret_key,
         minio_bucket=settings.minio_bucket,
+        minio_secure=settings.minio_secure,
     )
 
     anomaly_detector = AnomalyDetector(
@@ -133,16 +126,20 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     )
     await mqtt_client.connect()
 
+    app.state.basyx_client = basyx_client
+    app.state.fmu_runner = fmu_runner
+    app.state.anomaly_detector = anomaly_detector
+    app.state.mqtt_client = mqtt_client
+    app.state.health_fusion = health_fusion
+
     logger.info("Adaptiv-Monitor service started successfully")
 
     yield
 
     # Cleanup
     logger.info("Shutting down Adaptiv-Monitor service...")
-    if basyx_client:
-        await basyx_client.close()
-    if mqtt_client:
-        await mqtt_client.disconnect()
+    await basyx_client.close()
+    await mqtt_client.disconnect()
 
 
 app = FastAPI(
@@ -165,7 +162,7 @@ async def health_check() -> dict[str, str]:
 
 
 @app.post("/assess", response_model=HealthAssessment)
-async def assess_health(data: VibrationData) -> HealthAssessment:
+async def assess_health(data: VibrationData, request: Request) -> HealthAssessment:
     """
     Perform hybrid AI health assessment for an asset.
 
@@ -175,23 +172,26 @@ async def assess_health(data: VibrationData) -> HealthAssessment:
     4. Fuse ML and physics into HealthIndex
     5. Update AAS Health submodel
     """
-    if not all([basyx_client, fmu_runner, anomaly_detector, health_fusion, mqtt_client]):
-        raise HTTPException(status_code=503, detail="Service not fully initialized")
+    basyx_client = request.app.state.basyx_client
+    fmu_runner = request.app.state.fmu_runner
+    anomaly_detector = request.app.state.anomaly_detector
+    health_fusion = request.app.state.health_fusion
+    mqtt_client = request.app.state.mqtt_client
 
     logger.info(f"Assessing health for asset: {data.asset_id}")
 
     # Step 1: ML Anomaly Detection
-    anomaly_score = anomaly_detector.detect(data.vib_rms, data.omega, data.load)  # type: ignore[union-attr]
+    anomaly_score = anomaly_detector.detect(data.vib_rms, data.omega, data.load)
     logger.debug(f"Anomaly score: {anomaly_score:.3f}")
 
     # Step 2: FMU Physics Simulation
     try:
-        fmu_result = await fmu_runner.simulate(  # type: ignore[union-attr]
+        fmu_result = await fmu_runner.simulate(
             asset_id=data.asset_id,
             omega=data.omega,
             load=data.load,
             wear=data.wear,
-            basyx_client=basyx_client,  # type: ignore[arg-type]
+            basyx_client=basyx_client,
         )
         vib_expected = fmu_result.get("vib_rms_expected", data.vib_rms)
     except Exception as e:
@@ -204,14 +204,14 @@ async def assess_health(data: VibrationData) -> HealthAssessment:
     logger.debug(f"Physics residual: {physics_residual:.3f}")
 
     # Step 4: Health Fusion
-    result: HealthResult = health_fusion.compute(anomaly_score, physics_residual)  # type: ignore[union-attr]
+    result: HealthResult = health_fusion.compute(anomaly_score, physics_residual)
 
     # Generate decision rationale
     rationale = _generate_rationale(anomaly_score, physics_residual, result)
 
     # Step 5: Update AAS Health Submodel
     try:
-        await basyx_client.update_health_submodel(  # type: ignore[union-attr]
+        await basyx_client.update_health_submodel(
             asset_id=data.asset_id,
             health_index=result.health_index,
             health_confidence=result.health_confidence,
@@ -224,7 +224,7 @@ async def assess_health(data: VibrationData) -> HealthAssessment:
         logger.error(f"Failed to update AAS: {e}")
 
     # Step 6: Publish MQTT Event
-    await mqtt_client.publish_health_event(  # type: ignore[union-attr]
+    await mqtt_client.publish_health_event(
         asset_id=data.asset_id,
         health_index=result.health_index,
         health_confidence=result.health_confidence,
@@ -244,7 +244,9 @@ async def assess_health(data: VibrationData) -> HealthAssessment:
 
 
 @app.post("/trigger", response_model=HealthAssessment)
-async def trigger_assessment(request: TriggerRequest) -> HealthAssessment:
+async def trigger_assessment(
+    request: TriggerRequest, http_request: Request
+) -> HealthAssessment:
     """Convenience endpoint to trigger assessment with minimal parameters."""
     data = VibrationData(
         asset_id=request.asset_id,
@@ -253,16 +255,14 @@ async def trigger_assessment(request: TriggerRequest) -> HealthAssessment:
         load=request.load,
         wear=request.wear,
     )
-    return await assess_health(data)
+    return await assess_health(data, http_request)
 
 
 @app.get("/assets/{asset_id}/health", response_model=HealthAssessment | None)
-async def get_current_health(asset_id: str) -> HealthAssessment | None:
+async def get_current_health(asset_id: str, request: Request) -> HealthAssessment | None:
     """Get current health status from AAS for an asset."""
-    if not basyx_client:
-        raise HTTPException(status_code=503, detail="Service not initialized")
-
     try:
+        basyx_client = request.app.state.basyx_client
         health_data = await basyx_client.get_health_submodel(asset_id)
         if not health_data:
             return None

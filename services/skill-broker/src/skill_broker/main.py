@@ -30,7 +30,7 @@ from aas_contract import (
 from aas_contract import (
     __version__ as contract_version,
 )
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from skill_broker.aas_patcher import AASPatcher
@@ -43,12 +43,7 @@ from skill_broker.policy_engine import PolicyAction, PolicyEngine
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Global instances
 settings = Settings()
-policy_engine: PolicyEngine | None = None
-aas_patcher: AASPatcher | None = None
-mqtt_subscriber: MQTTSubscriber | None = None
-_evaluation_task: asyncio.Task[None] | None = None
 
 
 # ============================================================================
@@ -97,8 +92,6 @@ audit_log: list[AuditLogEntry] = []
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan for startup/shutdown."""
-    global policy_engine, aas_patcher, mqtt_subscriber, _evaluation_task
-
     logger.info("Starting Skill-Broker service...")
 
     # Initialize components
@@ -109,13 +102,19 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     mqtt_subscriber = MQTTSubscriber(
         broker_host=settings.mqtt_broker_host,
         broker_port=settings.mqtt_broker_port,
-        on_health_event=_handle_health_event,
+        on_health_event=lambda event: _handle_health_event(app, event),
     )
     await mqtt_subscriber.connect()
 
     # Start periodic evaluation (fallback if MQTT fails)
+    evaluation_task: asyncio.Task[None] | None = None
     if settings.enable_polling:
-        _evaluation_task = asyncio.create_task(_periodic_evaluation())
+        evaluation_task = asyncio.create_task(_periodic_evaluation(app))
+
+    app.state.policy_engine = policy_engine
+    app.state.aas_patcher = aas_patcher
+    app.state.mqtt_subscriber = mqtt_subscriber
+    app.state.evaluation_task = evaluation_task
 
     logger.info("Skill-Broker service started successfully")
 
@@ -123,16 +122,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     # Cleanup
     logger.info("Shutting down Skill-Broker service...")
-    if _evaluation_task:
-        _evaluation_task.cancel()
+    if evaluation_task:
+        evaluation_task.cancel()
         try:
-            await _evaluation_task
+            await evaluation_task
         except asyncio.CancelledError:
             logger.debug("Periodic evaluation task cancelled")
-    if aas_patcher:
-        await aas_patcher.close()
-    if mqtt_subscriber:
-        await mqtt_subscriber.disconnect()
+    await aas_patcher.close()
+    await mqtt_subscriber.disconnect()
 
 
 app = FastAPI(
@@ -148,19 +145,18 @@ app = FastAPI(
 # ============================================================================
 
 
-async def _handle_health_event(event: HealthEvent) -> None:
+async def _handle_health_event(app: FastAPI, event: HealthEvent) -> None:
     """Handle health event from MQTT."""
-    if not policy_engine or not aas_patcher:
-        return
-
     logger.info(f"Received health event: {event.asset_id} = {event.health_index}")
-    await _evaluate_and_apply(event.asset_id, event.health_index)
+    await _evaluate_and_apply(app, event.asset_id, event.health_index)
 
 
-async def _evaluate_and_apply(asset_id: str, health_index: int) -> list[PolicyAction]:
+async def _evaluate_and_apply(
+    app: FastAPI, asset_id: str, health_index: int
+) -> list[PolicyAction]:
     """Evaluate policy and apply capability changes."""
-    if not policy_engine or not aas_patcher:
-        return []
+    policy_engine: PolicyEngine = app.state.policy_engine
+    aas_patcher: AASPatcher = app.state.aas_patcher
 
     # Get actions from policy engine
     actions = policy_engine.evaluate(health_index)
@@ -198,12 +194,14 @@ async def _evaluate_and_apply(asset_id: str, health_index: int) -> list[PolicyAc
     return actions
 
 
-async def _periodic_evaluation() -> None:
+async def _periodic_evaluation(app: FastAPI) -> None:
     """Periodic evaluation (fallback for MQTT)."""
     while True:
         await asyncio.sleep(settings.polling_interval_seconds)
-        if not aas_patcher:
-            continue
+        aas_patcher: AASPatcher = app.state.aas_patcher
+        mqtt_subscriber: MQTTSubscriber = app.state.mqtt_subscriber
+
+        await mqtt_subscriber.ensure_connected()
 
         assets = await aas_patcher.list_assets()
         if not assets:
@@ -215,7 +213,7 @@ async def _periodic_evaluation() -> None:
                 health_index = await aas_patcher.get_health_index(asset_id)
                 if health_index is None:
                     continue
-                await _evaluate_and_apply(asset_id, health_index)
+                await _evaluate_and_apply(app, asset_id, health_index)
             except Exception as exc:
                 logger.error("Failed to evaluate asset %s: %s", asset_id, exc)
                 continue
@@ -245,16 +243,13 @@ async def debug_contract() -> dict[str, object]:
 
 
 @app.post("/evaluate", response_model=PolicyEvaluationResult)
-async def evaluate_health(event: HealthEvent) -> PolicyEvaluationResult:
+async def evaluate_health(event: HealthEvent, request: Request) -> PolicyEvaluationResult:
     """
     Manually trigger policy evaluation for a health event.
 
     Useful for testing and debugging.
     """
-    if not policy_engine:
-        raise HTTPException(status_code=503, detail="Service not initialized")
-
-    actions = await _evaluate_and_apply(event.asset_id, event.health_index)
+    actions = await _evaluate_and_apply(request.app, event.asset_id, event.health_index)
 
     return PolicyEvaluationResult(
         asset_id=event.asset_id,
@@ -265,8 +260,11 @@ async def evaluate_health(event: HealthEvent) -> PolicyEvaluationResult:
 
 
 @app.patch("/capability")
-async def patch_capability(patch: CapabilityPatch) -> dict[str, str]:
+async def patch_capability(
+    patch: CapabilityPatch, request: Request
+) -> dict[str, str]:
     """Manually patch a capability value (admin override)."""
+    aas_patcher = getattr(request.app.state, "aas_patcher", None)
     if not aas_patcher:
         raise HTTPException(status_code=503, detail="Service not initialized")
 
@@ -294,8 +292,9 @@ async def patch_capability(patch: CapabilityPatch) -> dict[str, str]:
 
 
 @app.get("/policy/rules")
-async def get_policy_rules() -> dict[str, list[dict[str, object]]]:
+async def get_policy_rules(request: Request) -> dict[str, list[dict[str, object]]]:
     """Get current policy rules."""
+    policy_engine = getattr(request.app.state, "policy_engine", None)
     if not policy_engine:
         raise HTTPException(status_code=503, detail="Service not initialized")
 

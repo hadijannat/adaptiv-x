@@ -19,7 +19,7 @@ from aas_contract import (
 from aas_contract import (
     __version__ as contract_version,
 )
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from fault_injector.clients import BrokerClient, MonitorClient
@@ -29,8 +29,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 settings = Settings()
-monitor_client: MonitorClient | None = None
-broker_client: BrokerClient | None = None
 
 
 class FaultInjectionRequest(BaseModel):
@@ -63,19 +61,18 @@ class FaultInjectionResponse(BaseModel):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    global monitor_client, broker_client
-
     logger.info("Starting Fault-Injector service...")
     monitor_client = MonitorClient(settings.monitor_url)
     broker_client = BrokerClient(settings.broker_url)
 
+    app.state.monitor_client = monitor_client
+    app.state.broker_client = broker_client
+
     yield
 
     logger.info("Shutting down Fault-Injector service...")
-    if monitor_client:
-        await monitor_client.close()
-    if broker_client:
-        await broker_client.close()
+    await monitor_client.close()
+    await broker_client.close()
 
 
 app = FastAPI(
@@ -104,9 +101,11 @@ async def debug_contract() -> dict[str, object]:
 
 
 @app.post("/inject", response_model=FaultInjectionResponse)
-async def inject_fault(request: FaultInjectionRequest) -> FaultInjectionResponse:
-    if not monitor_client or not broker_client:
-        raise HTTPException(status_code=503, detail="Service not initialized")
+async def inject_fault(
+    request: FaultInjectionRequest, http_request: Request
+) -> FaultInjectionResponse:
+    monitor_client: MonitorClient = http_request.app.state.monitor_client
+    broker_client: BrokerClient = http_request.app.state.broker_client
 
     assessment_payload = {
         "asset_id": request.asset_id,
