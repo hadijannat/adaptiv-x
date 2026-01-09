@@ -8,10 +8,11 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from base64 import urlsafe_b64encode
 from typing import Any
 
 import httpx
+
+from aas_contract import capability_submodel_id, encode_id, health_submodel_id
 
 logger = logging.getLogger(__name__)
 
@@ -33,10 +34,6 @@ class CapabilityQueryService:
     async def close(self) -> None:
         """Close the HTTP client."""
         await self._client.aclose()
-
-    def _encode_id(self, identifier: str) -> str:
-        """Base64-URL encode an identifier."""
-        return urlsafe_b64encode(identifier.encode()).decode().rstrip("=")
 
     def _extract_asset_id(self, entry: dict[str, Any]) -> str | None:
         asset_id = entry.get("idShort") or entry.get("id")
@@ -128,8 +125,8 @@ class CapabilityQueryService:
 
     async def get_capability_state(self, asset_id: str) -> dict[str, Any] | None:
         """Get capability state for a specific asset."""
-        submodel_id = f"urn:adaptivx:submodel:capability:{asset_id}"
-        encoded_id = self._encode_id(submodel_id)
+        submodel_id = capability_submodel_id(asset_id)
+        encoded_id = encode_id(submodel_id)
 
         try:
             response = await self._client.get(
@@ -161,8 +158,8 @@ class CapabilityQueryService:
 
     async def get_health_index(self, asset_id: str) -> int | None:
         """Get current health index for an asset."""
-        submodel_id = f"urn:adaptivx:submodel:health:{asset_id}"
-        encoded_id = self._encode_id(submodel_id)
+        submodel_id = health_submodel_id(asset_id)
+        encoded_id = encode_id(submodel_id)
 
         try:
             response = await self._client.get(

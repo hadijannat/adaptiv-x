@@ -10,12 +10,18 @@ Provides methods for:
 from __future__ import annotations
 
 import logging
-from base64 import urlsafe_b64encode
 from datetime import UTC, datetime
 from typing import Any
 from urllib.parse import quote
 
 import httpx
+
+from aas_contract import (
+    capability_submodel_id,
+    encode_id,
+    health_submodel_id,
+    simulation_submodel_id,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -40,18 +46,14 @@ class BasyxClient:
         """Close the HTTP client."""
         await self._client.aclose()
 
-    def _encode_id(self, identifier: str) -> str:
-        """Base64-URL encode an identifier for AAS API paths."""
-        return urlsafe_b64encode(identifier.encode()).decode().rstrip("=")
-
     # ========================================================================
     # Health Submodel Operations
     # ========================================================================
 
     async def get_health_submodel(self, asset_id: str) -> dict[str, Any] | None:
         """Get current health submodel values for an asset."""
-        submodel_id = f"urn:adaptivx:submodel:health:{asset_id}"
-        encoded_id = self._encode_id(submodel_id)
+        submodel_id = health_submodel_id(asset_id)
+        encoded_id = encode_id(submodel_id)
 
         try:
             response = await self._client.get(
@@ -91,8 +93,8 @@ class BasyxClient:
         rationale: str,
     ) -> None:
         """Update health submodel values for an asset."""
-        submodel_id = f"urn:adaptivx:submodel:health:{asset_id}"
-        encoded_sm_id = self._encode_id(submodel_id)
+        submodel_id = health_submodel_id(asset_id)
+        encoded_sm_id = encode_id(submodel_id)
 
         # Update each property via PATCH
         updates = [
@@ -134,8 +136,8 @@ class BasyxClient:
 
     async def get_fmu_url(self, asset_id: str) -> str | None:
         """Get the FMU download URL from SimulationModels submodel."""
-        submodel_id = f"urn:adaptivx:submodel:simulationmodels:{asset_id}"
-        encoded_id = self._encode_id(submodel_id)
+        submodel_id = simulation_submodel_id(asset_id)
+        encoded_id = encode_id(submodel_id)
 
         try:
             response = await self._client.get(
@@ -170,8 +172,8 @@ class BasyxClient:
 
     async def get_capability_state(self, asset_id: str) -> dict[str, Any] | None:
         """Get current capability state for an asset."""
-        submodel_id = f"urn:adaptivx:submodel:capability:{asset_id}"
-        encoded_id = self._encode_id(submodel_id)
+        submodel_id = capability_submodel_id(asset_id)
+        encoded_id = encode_id(submodel_id)
 
         try:
             response = await self._client.get(

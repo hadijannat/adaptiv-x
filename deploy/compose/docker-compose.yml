@@ -133,8 +133,8 @@ services:
 
   # adaptiv-monitor:
   #   build:
-  #     context: ../../services/adaptiv-monitor
-  #     dockerfile: Dockerfile
+  #     context: ../../
+  #     dockerfile: services/adaptiv-monitor/Dockerfile
   #   container_name: adaptivx-monitor
   #   ports:
   #     - "8011:8000"
@@ -159,8 +159,8 @@ services:
 
   # skill-broker:
   #   build:
-  #     context: ../../services/skill-broker
-  #     dockerfile: Dockerfile
+  #     context: ../../
+  #     dockerfile: services/skill-broker/Dockerfile
   #   container_name: adaptivx-skill-broker
   #   ports:
   #     - "8002:8000"
@@ -178,8 +178,8 @@ services:
 
   # job-dispatcher:
   #   build:
-  #     context: ../../services/job-dispatcher
-  #     dockerfile: Dockerfile
+  #     context: ../../
+  #     dockerfile: services/job-dispatcher/Dockerfile
   #   container_name: adaptivx-job-dispatcher
   #   ports:
   #     - "8003:8000"
@@ -196,8 +196,8 @@ services:
 
   # fault-injector:
   #   build:
-  #     context: ../../services/fault-injector
-  #     dockerfile: Dockerfile
+  #     context: ../../
+  #     dockerfile: services/fault-injector/Dockerfile
   #   container_name: adaptivx-fault-injector
   #   ports:
   #     - "8004:8000"

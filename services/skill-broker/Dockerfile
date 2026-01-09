@@ -5,13 +5,16 @@ WORKDIR /app
 
 RUN pip install --no-cache-dir poetry==1.7.1
 
-COPY pyproject.toml poetry.lock* ./
+COPY libs/ /app/libs/
+COPY services/skill-broker/pyproject.toml services/skill-broker/poetry.lock* /app/services/skill-broker/
+
+WORKDIR /app/services/skill-broker
 
 RUN poetry config virtualenvs.create false \
     && poetry install --only main --no-interaction --no-ansi --no-root
 
-COPY src/ ./src/
-COPY policy/ ./policy/
+COPY services/skill-broker/src/ /app/services/skill-broker/src/
+COPY services/skill-broker/policy/ /app/services/skill-broker/policy/
 
 # Runtime stage
 FROM python:3.11-slim
@@ -21,10 +24,11 @@ WORKDIR /app
 RUN groupadd -r adaptivx && useradd -r -g adaptivx adaptivx
 
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=builder /app/src /app/src
-COPY --from=builder /app/policy /app/policy
+COPY --from=builder /app/services/skill-broker/src /app/services/skill-broker/src
+COPY --from=builder /app/services/skill-broker/policy /app/services/skill-broker/policy
+COPY --from=builder /app/libs /app/libs
 
-ENV PYTHONPATH=/app/src
+ENV PYTHONPATH=/app/services/skill-broker/src:/app/libs
 ENV PYTHONUNBUFFERED=1
 
 USER adaptivx

@@ -16,6 +16,7 @@ pydantic-settings = "^2.1.0"
 httpx = "^0.26.0"
 paho-mqtt = "^2.0.0"
 pyyaml = "^6.0.1"
+aas-contract = {path = "../../libs/aas_contract", develop = true}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

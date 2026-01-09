@@ -5,12 +5,15 @@ WORKDIR /app
 
 RUN pip install --no-cache-dir poetry==1.7.1
 
-COPY pyproject.toml poetry.lock* ./
+COPY libs/ /app/libs/
+COPY services/job-dispatcher/pyproject.toml services/job-dispatcher/poetry.lock* /app/services/job-dispatcher/
+
+WORKDIR /app/services/job-dispatcher
 
 RUN poetry config virtualenvs.create false \
     && poetry install --only main --no-interaction --no-ansi --no-root
 
-COPY src/ ./src/
+COPY services/job-dispatcher/src/ /app/services/job-dispatcher/src/
 
 # Runtime stage
 FROM python:3.11-slim
@@ -20,9 +23,10 @@ WORKDIR /app
 RUN groupadd -r adaptivx && useradd -r -g adaptivx adaptivx
 
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=builder /app/src /app/src
+COPY --from=builder /app/services/job-dispatcher/src /app/services/job-dispatcher/src
+COPY --from=builder /app/libs /app/libs
 
-ENV PYTHONPATH=/app/src
+ENV PYTHONPATH=/app/services/job-dispatcher/src:/app/libs
 ENV PYTHONUNBUFFERED=1
 
 USER adaptivx

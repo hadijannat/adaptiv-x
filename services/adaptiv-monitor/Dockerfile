@@ -7,14 +7,16 @@ WORKDIR /app
 RUN pip install --no-cache-dir poetry==1.7.1
 
 # Copy dependency files
-COPY pyproject.toml poetry.lock* ./
+COPY libs/ /app/libs/
+COPY services/adaptiv-monitor/pyproject.toml services/adaptiv-monitor/poetry.lock* /app/services/adaptiv-monitor/
+WORKDIR /app/services/adaptiv-monitor
 
 # Install dependencies
 RUN poetry config virtualenvs.create false \
     && poetry install --only main --no-interaction --no-ansi --no-root
 
 # Copy source code
-COPY src/ ./src/
+COPY services/adaptiv-monitor/src/ /app/services/adaptiv-monitor/src/
 
 # Runtime stage
 FROM python:3.11-slim
@@ -26,10 +28,11 @@ RUN groupadd -r adaptivx && useradd -r -g adaptivx adaptivx
 
 # Copy installed packages and source
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=builder /app/src /app/src
+COPY --from=builder /app/services/adaptiv-monitor/src /app/services/adaptiv-monitor/src
+COPY --from=builder /app/libs /app/libs
 
 # Set environment
-ENV PYTHONPATH=/app/src
+ENV PYTHONPATH=/app/services/adaptiv-monitor/src:/app/libs
 ENV PYTHONUNBUFFERED=1
 
 # Switch to non-root user

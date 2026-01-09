@@ -17,6 +17,7 @@ httpx = "^0.26.0"
 paho-mqtt = "^2.0.0"
 fmpy = "^0.3.20"
 numpy = "^1.26.0"
+aas-contract = {path = "../../libs/aas_contract", develop = true}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

@@ -9,26 +9,10 @@ import os
 import pytest
 import pytest_asyncio
 import httpx
-from base64 import urlsafe_b64encode
+
+from aas_contract import encode_id, normalize_list
 
 AAS_ENV_URL = os.getenv("AAS_ENV_URL", "http://localhost:4001")
-
-def encode_id(identifier: str) -> str:
-    """Base64-URL encode an identifier for AAS API paths."""
-    return urlsafe_b64encode(identifier.encode()).decode().rstrip("=")
-
-
-def normalize_list(payload):
-    if isinstance(payload, dict):
-        result = payload.get("result")
-        if isinstance(result, list):
-            return result
-        if isinstance(result, dict):
-            items = result.get("items")
-            if isinstance(items, list):
-                return items
-    return payload if isinstance(payload, list) else []
-
 
 @pytest_asyncio.fixture
 async def client() -> httpx.AsyncClient:

@@ -7,10 +7,11 @@ Patches submodel elements in the BaSyx AAS Environment.
 from __future__ import annotations
 
 import logging
-from base64 import urlsafe_b64encode
 from urllib.parse import quote
 
 import httpx
+
+from aas_contract import capability_submodel_id, encode_id, health_submodel_id
 
 logger = logging.getLogger(__name__)
 
@@ -31,17 +32,13 @@ class AASPatcher:
         """Close the HTTP client."""
         await self._client.aclose()
 
-    def _encode_id(self, identifier: str) -> str:
-        """Base64-URL encode an identifier for AAS API paths."""
-        return urlsafe_b64encode(identifier.encode()).decode().rstrip("=")
-
     def _submodel_id_for_path(self, asset_id: str, element_path: str) -> str:
         """Derive submodel ID from element path."""
         if element_path.startswith("Capabilities"):
-            return f"urn:adaptivx:submodel:capability:{asset_id}"
+            return capability_submodel_id(asset_id)
         if element_path.startswith("Health"):
-            return f"urn:adaptivx:submodel:health:{asset_id}"
-        return f"urn:adaptivx:submodel:capability:{asset_id}"
+            return health_submodel_id(asset_id)
+        return capability_submodel_id(asset_id)
 
     def _normalize_element_path(self, element_path: str) -> str:
         """Strip submodel idShort prefix from the element path if present."""
@@ -54,7 +51,7 @@ class AASPatcher:
     async def _patch_submodel_element(
         self, submodel_id: str, element_path: str, value: str
     ) -> None:
-        encoded_sm_id = self._encode_id(submodel_id)
+        encoded_sm_id = encode_id(submodel_id)
         normalized_path = self._normalize_element_path(element_path)
         encoded_path = quote(normalized_path, safe="")
         url = (
@@ -72,7 +69,7 @@ class AASPatcher:
     async def _get_submodel_element(
         self, submodel_id: str, element_path: str
     ) -> str | None:
-        encoded_sm_id = self._encode_id(submodel_id)
+        encoded_sm_id = encode_id(submodel_id)
         normalized_path = self._normalize_element_path(element_path)
         encoded_path = quote(normalized_path, safe="")
         url = (
@@ -127,7 +124,7 @@ class AASPatcher:
 
     async def get_health_index(self, asset_id: str) -> int | None:
         """Get the HealthIndex value for an asset."""
-        submodel_id = f"urn:adaptivx:submodel:health:{asset_id}"
+        submodel_id = health_submodel_id(asset_id)
         try:
             value = await self._get_submodel_element(submodel_id, "HealthIndex")
             if value is None:
