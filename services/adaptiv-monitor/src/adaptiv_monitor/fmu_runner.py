@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import httpx
-from fmpy import simulate_fmu
+from fmpy import simulate_fmu  # type: ignore[import-untyped]
 
 if TYPE_CHECKING:
     from adaptiv_monitor.basyx_client import BasyxClient

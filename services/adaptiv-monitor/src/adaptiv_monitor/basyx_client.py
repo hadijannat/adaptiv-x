@@ -154,7 +154,10 @@ class BasyxClient:
                                 if sub2.get("idShort") == "ModelFileVersion":
                                     for sub3 in sub2.get("value", []):
                                         if sub3.get("idShort") == "DigitalFile":
-                                            return sub3.get("value")
+                                            value = sub3.get("value")
+                                            if value is None:
+                                                return None
+                                            return value if isinstance(value, str) else str(value)
 
             return None
         except Exception as e:

@@ -10,7 +10,7 @@ import asyncio
 import json
 import logging
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, cast
 
 import paho.mqtt.client as mqtt
 
@@ -36,14 +36,12 @@ class MQTTClient:
     async def connect(self) -> None:
         """Connect to the MQTT broker."""
         self._loop = asyncio.get_event_loop()
-        self._client = mqtt.Client(
-            client_id=self.client_id,
-            callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
-        )
+        self._client = mqtt.Client(client_id=self.client_id)
 
         # Set callbacks
-        self._client.on_connect = self._on_connect
-        self._client.on_disconnect = self._on_disconnect
+        client_any = cast(Any, self._client)
+        client_any.on_connect = self._on_connect
+        client_any.on_disconnect = self._on_disconnect
 
         try:
             self._client.connect_async(self.broker_host, self.broker_port)
@@ -76,7 +74,7 @@ class MQTTClient:
         client: mqtt.Client,
         userdata: Any,
         flags: dict[str, Any],
-        reason_code: mqtt.ReasonCode,
+        reason_code: int,
         properties: Any = None,
     ) -> None:
         """Callback when connected to broker."""
@@ -91,7 +89,7 @@ class MQTTClient:
         client: mqtt.Client,
         userdata: Any,
         flags: dict[str, Any],
-        reason_code: mqtt.ReasonCode,
+        reason_code: int,
         properties: Any = None,
     ) -> None:
         """Callback when disconnected from broker."""
