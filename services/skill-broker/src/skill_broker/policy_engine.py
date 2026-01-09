@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-
 from aas_contract import CAPABILITY_ELEMENT_PATHS
 
 logger = logging.getLogger(__name__)

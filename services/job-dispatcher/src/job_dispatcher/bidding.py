@@ -15,12 +15,10 @@ import logging
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
-from pydantic import BaseModel
-
-if TYPE_CHECKING:
 from aas_contract import CAPABILITY_ELEMENT_PATHS, HEALTH_ELEMENT_PATHS
+from pydantic import BaseModel
 
 from job_dispatcher.capability_query import CapabilityQueryService
 

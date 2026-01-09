@@ -11,7 +11,6 @@ import logging
 from typing import Any
 
 import httpx
-
 from aas_contract import (
     HEALTH_ELEMENT_PATHS,
     capability_submodel_id,

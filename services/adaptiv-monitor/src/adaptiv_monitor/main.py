@@ -19,15 +19,16 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-
 from aas_contract import (
     CAPABILITY_ELEMENT_PATHS,
     HEALTH_ELEMENT_PATHS,
     SUBMODEL_PREFIX,
+)
+from aas_contract import (
     __version__ as contract_version,
 )
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
 
 from adaptiv_monitor.basyx_client import BasyxClient
 from adaptiv_monitor.config import Settings

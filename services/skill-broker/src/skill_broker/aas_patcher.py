@@ -10,7 +10,6 @@ import logging
 from urllib.parse import quote
 
 import httpx
-
 from aas_contract import (
     HEALTH_ELEMENT_PATHS,
     capability_submodel_id,

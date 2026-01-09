@@ -11,15 +11,16 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from datetime import datetime
 
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-
 from aas_contract import (
     CAPABILITY_ELEMENT_PATHS,
     HEALTH_ELEMENT_PATHS,
     SUBMODEL_PREFIX,
+)
+from aas_contract import (
     __version__ as contract_version,
 )
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
 
 from fault_injector.clients import BrokerClient, MonitorClient
 from fault_injector.config import Settings
