@@ -24,6 +24,13 @@ from enum import Enum
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
+from aas_contract import (
+    CAPABILITY_ELEMENT_PATHS,
+    HEALTH_ELEMENT_PATHS,
+    SUBMODEL_PREFIX,
+    __version__ as contract_version,
+)
+
 from job_dispatcher.bidding import Bid, BiddingService, Contract
 from job_dispatcher.capability_query import CapabilityQueryService
 from job_dispatcher.config import Settings
@@ -151,6 +158,18 @@ app = FastAPI(
 async def health_check() -> dict[str, str]:
     """Service health check endpoint."""
     return {"status": "healthy", "service": "job-dispatcher"}
+
+
+@app.get("/debug/contract")
+async def debug_contract() -> dict[str, object]:
+    """Expose shared AAS contract paths for verification."""
+    return {
+        "service": "job-dispatcher",
+        "contract_version": contract_version,
+        "submodel_prefix": SUBMODEL_PREFIX,
+        "health_paths": HEALTH_ELEMENT_PATHS,
+        "capability_paths": CAPABILITY_ELEMENT_PATHS,
+    }
 
 
 @app.post("/dispatch", response_model=JobAssignment)
@@ -299,11 +318,26 @@ def _evaluate_candidate(
     requirements: CapabilityRequirement,
 ) -> AssetCandidate:
     """Evaluate if an asset meets job requirements."""
-    surface_grade = str(capability.get("SurfaceFinishGrade", "C"))
-    tolerance = str(capability.get("ToleranceClass", "±0.1mm"))
-    assurance = str(capability.get("AssuranceState", "notAvailable"))
-    energy_cost = _coerce_float(capability.get("EnergyCostPerPart_kWh", 999.0), 999.0)
-    health = _coerce_int(capability.get("HealthIndex"))
+    surface_grade = str(
+        capability.get(CAPABILITY_ELEMENT_PATHS["surface_finish"].split("/")[-1], "C")
+    )
+    tolerance = str(
+        capability.get(
+            CAPABILITY_ELEMENT_PATHS["tolerance_class"].split("/")[-1], "±0.1mm"
+        )
+    )
+    assurance = str(
+        capability.get(
+            CAPABILITY_ELEMENT_PATHS["assurance_state"].split("/")[-1], "notAvailable"
+        )
+    )
+    energy_cost = _coerce_float(
+        capability.get(CAPABILITY_ELEMENT_PATHS["energy_cost"].split("/")[-1], 999.0),
+        999.0,
+    )
+    health = _coerce_int(
+        capability.get(HEALTH_ELEMENT_PATHS["health_index"].split(".")[-1])
+    )
 
     rejection_reasons: list[str] = []
 

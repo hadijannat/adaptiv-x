@@ -25,6 +25,13 @@ from datetime import UTC, datetime
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
+from aas_contract import (
+    CAPABILITY_ELEMENT_PATHS,
+    HEALTH_ELEMENT_PATHS,
+    SUBMODEL_PREFIX,
+    __version__ as contract_version,
+)
+
 from skill_broker.aas_patcher import AASPatcher
 from skill_broker.config import Settings
 from skill_broker.models import HealthEvent
@@ -218,6 +225,18 @@ async def _periodic_evaluation() -> None:
 async def health_check() -> dict[str, str]:
     """Service health check endpoint."""
     return {"status": "healthy", "service": "skill-broker"}
+
+
+@app.get("/debug/contract")
+async def debug_contract() -> dict[str, object]:
+    """Expose shared AAS contract paths for verification."""
+    return {
+        "service": "skill-broker",
+        "contract_version": contract_version,
+        "submodel_prefix": SUBMODEL_PREFIX,
+        "health_paths": HEALTH_ELEMENT_PATHS,
+        "capability_paths": CAPABILITY_ELEMENT_PATHS,
+    }
 
 
 @app.post("/evaluate", response_model=PolicyEvaluationResult)

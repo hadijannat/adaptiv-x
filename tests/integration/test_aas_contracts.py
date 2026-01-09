@@ -10,7 +10,12 @@ import pytest
 import pytest_asyncio
 import httpx
 
-from aas_contract import encode_id, normalize_list
+from aas_contract import (
+    capability_submodel_id,
+    encode_id,
+    health_submodel_id,
+    normalize_list,
+)
 
 AAS_ENV_URL = os.getenv("AAS_ENV_URL", "http://localhost:4001")
 
@@ -34,7 +39,7 @@ async def test_aas_discovery(client):
 async def test_capability_submodel_contract(client):
     """Verify Capability submodel structure and semantic IDs."""
     asset_id = "milling-01"
-    submodel_id = f"urn:adaptivx:submodel:capability:{asset_id}"
+    submodel_id = capability_submodel_id(asset_id)
     encoded_id = encode_id(submodel_id)
     
     response = await client.get(f"/submodels/{encoded_id}")
@@ -57,7 +62,7 @@ async def test_capability_submodel_contract(client):
 async def test_health_submodel_contract(client):
     """Verify Health submodel structure."""
     asset_id = "milling-01"
-    submodel_id = f"urn:adaptivx:submodel:health:{asset_id}"
+    submodel_id = health_submodel_id(asset_id)
     encoded_id = encode_id(submodel_id)
     
     response = await client.get(f"/submodels/{encoded_id}")

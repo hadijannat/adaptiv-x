@@ -14,6 +14,13 @@ from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
+from aas_contract import (
+    CAPABILITY_ELEMENT_PATHS,
+    HEALTH_ELEMENT_PATHS,
+    SUBMODEL_PREFIX,
+    __version__ as contract_version,
+)
+
 from fault_injector.clients import BrokerClient, MonitorClient
 from fault_injector.config import Settings
 
@@ -81,6 +88,18 @@ app = FastAPI(
 @app.get("/health")
 async def health_check() -> dict[str, str]:
     return {"status": "healthy", "service": "fault-injector"}
+
+
+@app.get("/debug/contract")
+async def debug_contract() -> dict[str, object]:
+    """Expose shared AAS contract paths for verification."""
+    return {
+        "service": "fault-injector",
+        "contract_version": contract_version,
+        "submodel_prefix": SUBMODEL_PREFIX,
+        "health_paths": HEALTH_ELEMENT_PATHS,
+        "capability_paths": CAPABILITY_ELEMENT_PATHS,
+    }
 
 
 @app.post("/inject", response_model=FaultInjectionResponse)

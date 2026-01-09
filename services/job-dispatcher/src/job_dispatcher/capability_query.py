@@ -12,7 +12,12 @@ from typing import Any
 
 import httpx
 
-from aas_contract import capability_submodel_id, encode_id, health_submodel_id
+from aas_contract import (
+    HEALTH_ELEMENT_PATHS,
+    capability_submodel_id,
+    encode_id,
+    health_submodel_id,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -120,7 +125,7 @@ class CapabilityQueryService:
         if not capability:
             return asset_id, None
         health = await self.get_health_index(asset_id)
-        capability["HealthIndex"] = health
+        capability[HEALTH_ELEMENT_PATHS["health_index"]] = health
         return asset_id, capability
 
     async def get_capability_state(self, asset_id: str) -> dict[str, Any] | None:
@@ -170,7 +175,7 @@ class CapabilityQueryService:
             submodel = response.json()
 
             for element in submodel.get("submodelElements", []):
-                if element.get("idShort") == "HealthIndex":
+                if element.get("idShort") == HEALTH_ELEMENT_PATHS["health_index"]:
                     return int(element.get("value", 100))
 
             return None

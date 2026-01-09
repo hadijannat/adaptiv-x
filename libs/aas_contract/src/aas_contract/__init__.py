@@ -8,6 +8,7 @@ from .models import CapabilityPayload, HealthPayload, SimulationModelReference
 from .paths import (
     CAPABILITY_ELEMENT_PATHS,
     HEALTH_ELEMENT_PATHS,
+    SUBMODEL_PREFIX,
     capability_submodel_id,
     encode_id,
     health_submodel_id,
@@ -15,9 +16,12 @@ from .paths import (
     simulation_submodel_id,
 )
 
+__version__ = "0.1.0"
+
 __all__ = [
     "CAPABILITY_ELEMENT_PATHS",
     "HEALTH_ELEMENT_PATHS",
+    "SUBMODEL_PREFIX",
     "CapabilityPayload",
     "HealthPayload",
     "SimulationModelReference",

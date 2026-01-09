@@ -17,6 +17,7 @@ from urllib.parse import quote
 import httpx
 
 from aas_contract import (
+    HEALTH_ELEMENT_PATHS,
     capability_submodel_id,
     encode_id,
     health_submodel_id,
@@ -98,11 +99,11 @@ class BasyxClient:
 
         # Update each property via PATCH
         updates = [
-            ("HealthIndex", str(health_index)),
-            ("HealthConfidence", str(health_confidence)),
-            ("AnomalyScore", str(anomaly_score)),
-            ("PhysicsResidual", str(physics_residual)),
-            ("LastUpdate", datetime.now(UTC).isoformat()),
+            (HEALTH_ELEMENT_PATHS["health_index"], str(health_index)),
+            (HEALTH_ELEMENT_PATHS["health_confidence"], str(health_confidence)),
+            (HEALTH_ELEMENT_PATHS["anomaly_score"], str(anomaly_score)),
+            (HEALTH_ELEMENT_PATHS["physics_residual"], str(physics_residual)),
+            (HEALTH_ELEMENT_PATHS["last_update"], datetime.now(UTC).isoformat()),
         ]
 
         for id_short, value in updates:
@@ -111,7 +112,7 @@ class BasyxClient:
         # Update rationale in nested collection
         await self._patch_property(
             encoded_sm_id,
-            "ExplainabilityBundle.DecisionRationale",
+            HEALTH_ELEMENT_PATHS["decision_rationale"],
             rationale,
         )
 

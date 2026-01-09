@@ -14,6 +14,8 @@ from typing import Any
 
 import yaml
 
+from aas_contract import CAPABILITY_ELEMENT_PATHS
+
 logger = logging.getLogger(__name__)
 
 
@@ -101,19 +103,19 @@ class PolicyEngine:
                 priority=10,
                 actions=[
                     PolicyAction(
-                        path="Capabilities/ProcessCapability:Milling/AssuranceState",
+                        path=CAPABILITY_ELEMENT_PATHS["assurance_state"],
                         value="notAvailable",
                     ),
                     PolicyAction(
-                        path="Capabilities/ProcessCapability:Milling/SurfaceFinishGrade",
+                        path=CAPABILITY_ELEMENT_PATHS["surface_finish"],
                         value="C",
                     ),
                     PolicyAction(
-                        path="Capabilities/ProcessCapability:Milling/ToleranceClass",
+                        path=CAPABILITY_ELEMENT_PATHS["tolerance_class"],
                         value="±0.05mm",
                     ),
                     PolicyAction(
-                        path="Capabilities/ProcessCapability:Milling/EnergyCostPerPart_kWh",
+                        path=CAPABILITY_ELEMENT_PATHS["energy_cost"],
                         value="1.25",
                     ),
                 ],
@@ -124,15 +126,15 @@ class PolicyEngine:
                 priority=5,
                 actions=[
                     PolicyAction(
-                        path="Capabilities/ProcessCapability:Milling/AssuranceState",
+                        path=CAPABILITY_ELEMENT_PATHS["assurance_state"],
                         value="offered",
                     ),
                     PolicyAction(
-                        path="Capabilities/ProcessCapability:Milling/SurfaceFinishGrade",
+                        path=CAPABILITY_ELEMENT_PATHS["surface_finish"],
                         value="B",
                     ),
                     PolicyAction(
-                        path="Capabilities/ProcessCapability:Milling/EnergyCostPerPart_kWh",
+                        path=CAPABILITY_ELEMENT_PATHS["energy_cost"],
                         value="1.0",
                     ),
                 ],
@@ -143,19 +145,19 @@ class PolicyEngine:
                 priority=1,
                 actions=[
                     PolicyAction(
-                        path="Capabilities/ProcessCapability:Milling/AssuranceState",
+                        path=CAPABILITY_ELEMENT_PATHS["assurance_state"],
                         value="assured",
                     ),
                     PolicyAction(
-                        path="Capabilities/ProcessCapability:Milling/SurfaceFinishGrade",
+                        path=CAPABILITY_ELEMENT_PATHS["surface_finish"],
                         value="A",
                     ),
                     PolicyAction(
-                        path="Capabilities/ProcessCapability:Milling/ToleranceClass",
+                        path=CAPABILITY_ELEMENT_PATHS["tolerance_class"],
                         value="±0.02mm",
                     ),
                     PolicyAction(
-                        path="Capabilities/ProcessCapability:Milling/EnergyCostPerPart_kWh",
+                        path=CAPABILITY_ELEMENT_PATHS["energy_cost"],
                         value="0.85",
                     ),
                 ],

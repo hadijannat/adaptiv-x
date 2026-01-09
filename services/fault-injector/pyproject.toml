@@ -14,6 +14,7 @@ uvicorn = {extras = ["standard"], version = "^0.27.0"}
 httpx = "^0.26.0"
 pydantic = "^2.6.0"
 pydantic-settings = "^2.1.0"
+aas-contract = {path = "../../libs/aas_contract", develop = true}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

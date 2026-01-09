@@ -20,7 +20,9 @@ from typing import TYPE_CHECKING, Any
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
-    from job_dispatcher.capability_query import CapabilityQueryService
+from aas_contract import CAPABILITY_ELEMENT_PATHS, HEALTH_ELEMENT_PATHS
+
+from job_dispatcher.capability_query import CapabilityQueryService
 
 logger = logging.getLogger(__name__)
 
@@ -122,9 +124,18 @@ class BiddingService:
         self, rfb_id: str, asset_id: str, capability: dict[str, Any]
     ) -> Bid:
         """Generate a bid from an asset based on its capability state."""
-        assurance = str(capability.get("AssuranceState", "notAvailable"))
-        energy_cost = float(capability.get("EnergyCostPerPart_kWh", 1.5))
-        health = capability.get("HealthIndex", 100)
+        assurance = str(
+            capability.get(
+                CAPABILITY_ELEMENT_PATHS["assurance_state"].split("/")[-1],
+                "notAvailable",
+            )
+        )
+        energy_cost = float(
+            capability.get(CAPABILITY_ELEMENT_PATHS["energy_cost"].split("/")[-1], 1.5)
+        )
+        health = capability.get(
+            HEALTH_ELEMENT_PATHS["health_index"].split(".")[-1], 100
+        )
 
         # Compute risk based on health and assurance
         if assurance == "assured":

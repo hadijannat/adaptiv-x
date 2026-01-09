@@ -22,6 +22,13 @@ from datetime import UTC, datetime
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
+from aas_contract import (
+    CAPABILITY_ELEMENT_PATHS,
+    HEALTH_ELEMENT_PATHS,
+    SUBMODEL_PREFIX,
+    __version__ as contract_version,
+)
+
 from adaptiv_monitor.basyx_client import BasyxClient
 from adaptiv_monitor.config import Settings
 from adaptiv_monitor.fmu_runner import FMURunner
@@ -261,16 +268,32 @@ async def get_current_health(asset_id: str) -> HealthAssessment | None:
 
         return HealthAssessment(
             asset_id=asset_id,
-            health_index=health_data.get("HealthIndex", 100),
-            health_confidence=health_data.get("HealthConfidence", 1.0),
-            anomaly_score=health_data.get("AnomalyScore", 0.0),
-            physics_residual=health_data.get("PhysicsResidual", 0.0),
+            health_index=health_data.get(HEALTH_ELEMENT_PATHS["health_index"], 100),
+            health_confidence=health_data.get(
+                HEALTH_ELEMENT_PATHS["health_confidence"], 1.0
+            ),
+            anomaly_score=health_data.get(HEALTH_ELEMENT_PATHS["anomaly_score"], 0.0),
+            physics_residual=health_data.get(
+                HEALTH_ELEMENT_PATHS["physics_residual"], 0.0
+            ),
             decision_rationale=health_data.get("DecisionRationale", ""),
             timestamp=datetime.now(UTC),
         )
     except Exception as e:
         logger.error(f"Failed to get health for {asset_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e)) from e
+
+
+@app.get("/debug/contract")
+async def debug_contract() -> dict[str, object]:
+    """Expose shared AAS contract paths for verification."""
+    return {
+        "service": "adaptiv-monitor",
+        "contract_version": contract_version,
+        "submodel_prefix": SUBMODEL_PREFIX,
+        "health_paths": HEALTH_ELEMENT_PATHS,
+        "capability_paths": CAPABILITY_ELEMENT_PATHS,
+    }
 
 
 # ============================================================================

@@ -11,7 +11,12 @@ from urllib.parse import quote
 
 import httpx
 
-from aas_contract import capability_submodel_id, encode_id, health_submodel_id
+from aas_contract import (
+    HEALTH_ELEMENT_PATHS,
+    capability_submodel_id,
+    encode_id,
+    health_submodel_id,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -126,7 +131,9 @@ class AASPatcher:
         """Get the HealthIndex value for an asset."""
         submodel_id = health_submodel_id(asset_id)
         try:
-            value = await self._get_submodel_element(submodel_id, "HealthIndex")
+            value = await self._get_submodel_element(
+                submodel_id, HEALTH_ELEMENT_PATHS["health_index"]
+            )
             if value is None:
                 return None
             return int(float(value))
