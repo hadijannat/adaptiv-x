@@ -43,6 +43,7 @@ ignore = ["S101"] # Allow assert for tests
 python_version = "3.11"
 strict = true
 plugins = ["pydantic.mypy"]
+mypy_path = ["../../libs/aas_contract/src"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

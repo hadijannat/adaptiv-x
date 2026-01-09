@@ -38,6 +38,7 @@ ignore = ["S101"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
+mypy_path = ["../../libs/aas_contract/src"]
 
 [build-system]
 requires = ["poetry-core"]
