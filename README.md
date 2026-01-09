@@ -228,10 +228,10 @@ Apache License 2.0 - See [LICENSE](LICENSE) for details.
 If you use Adaptiv-X in research, please cite:
 
 ```bibtex
-@software{adaptivx2025,
+@software{adaptivx2026,
   title = {Adaptiv-X: Capability-Based Self-Healing for Industrial Digital Twins},
-  year = {2025},
-  url = {https://github.com/adaptiv-x/self-healing-aas}
+  year = {2026},
+  url = {https://github.com/hadijannat/adaptiv-x}
 }
 ```
 

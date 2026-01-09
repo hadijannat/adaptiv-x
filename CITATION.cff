@@ -3,9 +3,9 @@ message: "If you use this software, please cite it as below."
 type: software
 title: "Adaptiv-X: Capability-Based Self-Healing for Industrial Digital Twins"
 version: 0.1.0
-date-released: 2025-01-01
-url: "https://github.com/adaptiv-x/self-healing-aas"
-repository-code: "https://github.com/adaptiv-x/self-healing-aas"
+date-released: 2026-01-09
+url: "https://github.com/hadijannat/adaptiv-x"
+repository-code: "https://github.com/hadijannat/adaptiv-x"
 license: Apache-2.0
 keywords:
   - digital-twin
