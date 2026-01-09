@@ -26,7 +26,8 @@ class MonitorClient:
             headers={"Content-Type": "application/json"},
         )
         response.raise_for_status()
-        return response.json()
+        data = response.json()
+        return data if isinstance(data, dict) else {}
 
 
 class BrokerClient:
@@ -46,4 +47,5 @@ class BrokerClient:
             headers={"Content-Type": "application/json"},
         )
         response.raise_for_status()
-        return response.json()
+        data = response.json()
+        return data if isinstance(data, dict) else {}

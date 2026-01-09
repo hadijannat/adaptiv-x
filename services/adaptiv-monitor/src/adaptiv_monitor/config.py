@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     """Service configuration loaded from environment variables."""
 
     # Service settings
-    host: str = "0.0.0.0"
+    host: str = "0.0.0.0"  # noqa: S104
     port: int = 8011
     debug: bool = False
 
@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # MinIO (for FMU storage)
     minio_endpoint: str = "localhost:9000"
     minio_access_key: str = "adaptivx"
-    minio_secret_key: str = "adaptivx123"
+    minio_secret_key: str = "adaptivx123"  # noqa: S105
     minio_bucket: str = "adaptivx-fmu"
     minio_secure: bool = False
 

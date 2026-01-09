@@ -27,6 +27,7 @@ from pydantic import BaseModel, Field
 
 from skill_broker.aas_patcher import AASPatcher
 from skill_broker.config import Settings
+from skill_broker.models import HealthEvent
 from skill_broker.mqtt_subscriber import MQTTSubscriber
 from skill_broker.policy_engine import PolicyAction, PolicyEngine
 
@@ -45,14 +46,6 @@ _evaluation_task: asyncio.Task[None] | None = None
 # ============================================================================
 # Pydantic Models
 # ============================================================================
-
-
-class HealthEvent(BaseModel):
-    """Health event received from adaptiv-monitor."""
-
-    asset_id: str
-    health_index: int = Field(..., ge=0, le=100)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class CapabilityPatch(BaseModel):

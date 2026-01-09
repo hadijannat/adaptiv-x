@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import logging
 from base64 import urlsafe_b64encode
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 from urllib.parse import quote
 
@@ -100,7 +100,7 @@ class BasyxClient:
             ("HealthConfidence", str(health_confidence)),
             ("AnomalyScore", str(anomaly_score)),
             ("PhysicsResidual", str(physics_residual)),
-            ("LastUpdate", datetime.now(timezone.utc).isoformat()),
+            ("LastUpdate", datetime.now(UTC).isoformat()),
         ]
 
         for id_short, value in updates:

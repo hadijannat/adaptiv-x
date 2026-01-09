@@ -9,22 +9,15 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Coroutine
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, cast
 
 import paho.mqtt.client as mqtt
-from pydantic import BaseModel
+
+from skill_broker.models import HealthEvent
 
 logger = logging.getLogger(__name__)
-
-
-class HealthEvent(BaseModel):
-    """Health event from adaptiv-monitor."""
-
-    asset_id: str
-    health_index: int
-    timestamp: datetime
 
 
 class MQTTSubscriber:
@@ -48,15 +41,13 @@ class MQTTSubscriber:
     async def connect(self) -> None:
         """Connect to the MQTT broker and subscribe to topics."""
         self._loop = asyncio.get_event_loop()
-        self._client = mqtt.Client(
-            client_id=self.client_id,
-            callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
-        )
+        self._client = mqtt.Client(client_id=self.client_id)
 
         # Set callbacks
-        self._client.on_connect = self._on_connect
-        self._client.on_disconnect = self._on_disconnect
-        self._client.on_message = self._on_message
+        client_any = cast(Any, self._client)
+        setattr(client_any, "on_connect", self._on_connect)
+        setattr(client_any, "on_disconnect", self._on_disconnect)
+        setattr(client_any, "on_message", self._on_message)
 
         try:
             self._client.connect_async(self.broker_host, self.broker_port)
@@ -87,7 +78,7 @@ class MQTTSubscriber:
         client: mqtt.Client,
         userdata: Any,
         flags: dict[str, Any],
-        reason_code: mqtt.ReasonCode,
+        reason_code: int,
         properties: Any = None,
     ) -> None:
         """Callback when connected to broker."""
@@ -102,7 +93,7 @@ class MQTTSubscriber:
         client: mqtt.Client,
         userdata: Any,
         flags: dict[str, Any],
-        reason_code: mqtt.ReasonCode,
+        reason_code: int,
         properties: Any = None,
     ) -> None:
         """Callback when disconnected from broker."""
@@ -131,9 +122,8 @@ class MQTTSubscriber:
 
             # Invoke callback in event loop
             if self._on_health_event and self._loop:
-                asyncio.run_coroutine_threadsafe(
-                    self._on_health_event(event), self._loop
-                )
+                coro = cast(Coroutine[Any, Any, None], self._on_health_event(event))
+                asyncio.run_coroutine_threadsafe(coro, self._loop)
 
         except Exception as e:
             logger.error(f"Failed to process MQTT message: {e}")

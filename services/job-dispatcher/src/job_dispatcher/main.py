@@ -302,8 +302,8 @@ def _evaluate_candidate(
     surface_grade = str(capability.get("SurfaceFinishGrade", "C"))
     tolerance = str(capability.get("ToleranceClass", "±0.1mm"))
     assurance = str(capability.get("AssuranceState", "notAvailable"))
-    energy_cost = float(capability.get("EnergyCostPerPart_kWh", 999.0))
-    health = capability.get("HealthIndex")
+    energy_cost = _coerce_float(capability.get("EnergyCostPerPart_kWh", 999.0), 999.0)
+    health = _coerce_int(capability.get("HealthIndex"))
 
     rejection_reasons: list[str] = []
 
@@ -339,10 +339,36 @@ def _evaluate_candidate(
         tolerance_class=tolerance,
         assurance_state=assurance,
         energy_cost_per_part=energy_cost,
-        health_index=int(health) if health is not None else None,
+        health_index=health,
         eligible=eligible,
         rejection_reason="; ".join(rejection_reasons) if rejection_reasons else None,
     )
+
+
+def _coerce_float(value: object, default: float) -> float:
+    if isinstance(value, (int, float)):
+        return float(value)
+    if isinstance(value, str):
+        try:
+            return float(value)
+        except ValueError:
+            return default
+    return default
+
+
+def _coerce_int(value: object) -> int | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        return int(value)
+    if isinstance(value, str):
+        try:
+            return int(float(value))
+        except ValueError:
+            return None
+    return None
 
 
 def _parse_tolerance_mm(value: str) -> float | None:

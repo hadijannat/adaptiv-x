@@ -15,9 +15,9 @@ Part of Adaptiv-X: Capability-Based Self-Healing Digital Twin
 from __future__ import annotations
 
 import logging
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
-from typing import AsyncGenerator
+from datetime import UTC, datetime
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
@@ -28,7 +28,6 @@ from adaptiv_monitor.fmu_runner import FMURunner
 from adaptiv_monitor.health_fusion import HealthFusion, HealthResult
 from adaptiv_monitor.ml_model import AnomalyDetector
 from adaptiv_monitor.mqtt_client import MQTTClient
-
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -52,7 +51,7 @@ class VibrationData(BaseModel):
     """Vibration measurement data from sensors."""
 
     asset_id: str = Field(..., description="Asset identifier (e.g., milling-01)")
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     vib_rms: float = Field(..., ge=0, description="Measured RMS vibration [mm/s]")
     omega: float = Field(..., ge=0, description="Spindle speed [rad/s]")
     load: float = Field(..., ge=0, description="Cutting load [N]")
@@ -232,7 +231,7 @@ async def assess_health(data: VibrationData) -> HealthAssessment:
         anomaly_score=anomaly_score,
         physics_residual=physics_residual,
         decision_rationale=rationale,
-        timestamp=datetime.now(timezone.utc),
+        timestamp=datetime.now(UTC),
     )
 
 
@@ -267,7 +266,7 @@ async def get_current_health(asset_id: str) -> HealthAssessment | None:
             anomaly_score=health_data.get("AnomalyScore", 0.0),
             physics_residual=health_data.get("PhysicsResidual", 0.0),
             decision_rationale=health_data.get("DecisionRationale", ""),
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
         )
     except Exception as e:
         logger.error(f"Failed to get health for {asset_id}: {e}")

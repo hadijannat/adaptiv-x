@@ -56,13 +56,15 @@ This implementation treats the Asset Administration Shell (AAS) not as a passive
 5. **skill-broker** downgrades capabilities in AAS (Grade A → not assured)
 6. **Dispatcher** queries again and routes precision work to `milling-02` automatically
 
-## Screenshots
+## Visualized Demo
 
-| Scenario | Preview |
+| Step | What you should see |
 | --- | --- |
-| Fault injected (health drops) | ![Fault injected](docs/screenshots/03_fault_injected.png) |
-| Capability downgraded (not available) | ![Capability downgraded](docs/screenshots/04_capability_downgraded.png) |
-| Job rerouted to milling-02 | ![Job rerouted](docs/screenshots/05_job_rerouted.png) |
+| 1. Initial state | ![Initial state](docs/screenshots/01_initial_state.png) |
+| 2. Job dispatched to milling-01 | ![Job dispatched](docs/screenshots/02_job_dispatched_milling01.png) |
+| 3. Fault injected (health drops) | ![Fault injected](docs/screenshots/03_fault_injected.png) |
+| 4. Capability downgraded | ![Capability downgraded](docs/screenshots/04_capability_downgraded.png) |
+| 5. Job rerouted to milling-02 | ![Job rerouted](docs/screenshots/05_job_rerouted.png) |
 
 This demonstrates **resilience through adaptation** rather than failure through alarms.
 
@@ -120,6 +122,25 @@ cd dashboard
 npm install
 npm run dev
 ```
+
+## Ports
+
+| Component | Default port(s) | Notes |
+| --- | --- | --- |
+| Dashboard | `3000` | Vite dev server |
+| adaptiv-monitor | `8011` | Local dev (container listens on `8000`) |
+| skill-broker | `8002` | Local dev (container listens on `8000`) |
+| job-dispatcher | `8003` | Local dev (container listens on `8000`) |
+| fault-injector | `8004` | Local dev (container listens on `8000`) |
+| AAS Environment | `4001` | BaSyx repository |
+| AAS Registry | `4000` | AAS descriptors |
+| Submodel Registry | `4002` | Submodel descriptors |
+| Mosquitto MQTT | `1883` | TCP |
+| Mosquitto WebSockets | `9883` | MQTT over WS |
+| MinIO S3 | `9000` | Docker Compose default |
+| MinIO Console | `9001` | Docker Compose default |
+
+If ports are already in use, Docker may remap host ports (check `docker ps`).
 
 ## Standards & Compliance
 

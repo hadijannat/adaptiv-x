@@ -107,21 +107,27 @@ class HealthFusion:
         # Smooth anomaly score
         if history_anomaly:
             avg_anomaly = sum(history_anomaly) / len(history_anomaly)
-            smoothed_anomaly = (1 - history_weight) * current_anomaly + history_weight * avg_anomaly
+            smoothed_anomaly = (
+                (1 - history_weight) * current_anomaly + history_weight * avg_anomaly
+            )
         else:
             smoothed_anomaly = current_anomaly
 
         # Smooth physics residual
         if history_residual:
             avg_residual = sum(history_residual) / len(history_residual)
-            smoothed_residual = (1 - history_weight) * current_residual + history_weight * avg_residual
+            smoothed_residual = (
+                (1 - history_weight) * current_residual + history_weight * avg_residual
+            )
         else:
             smoothed_residual = current_residual
 
         return self.compute(smoothed_anomaly, smoothed_residual)
 
 
-def compute_health(anomaly_score: float, physics_residual: float) -> tuple[int, float, float, float]:
+def compute_health(
+    anomaly_score: float, physics_residual: float
+) -> tuple[int, float, float, float]:
     """
     Convenience function for health computation.
 

@@ -9,7 +9,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import paho.mqtt.client as mqtt
@@ -52,7 +52,11 @@ class MQTTClient:
             # Wait for connection with timeout
             for _ in range(50):  # 5 seconds timeout
                 if self._connected:
-                    logger.info(f"Connected to MQTT broker at {self.broker_host}:{self.broker_port}")
+                    logger.info(
+                        "Connected to MQTT broker at %s:%s",
+                        self.broker_host,
+                        self.broker_port,
+                    )
                     return
                 await asyncio.sleep(0.1)
 
@@ -112,14 +116,16 @@ class MQTTClient:
             return
 
         topic = f"adaptivx/health/{asset_id}"
-        payload = json.dumps({
-            "asset_id": asset_id,
-            "health_index": health_index,
-            "health_confidence": health_confidence,
-            "anomaly_score": anomaly_score,
-            "physics_residual": physics_residual,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        })
+        payload = json.dumps(
+            {
+                "asset_id": asset_id,
+                "health_index": health_index,
+                "health_confidence": health_confidence,
+                "anomaly_score": anomaly_score,
+                "physics_residual": physics_residual,
+                "timestamp": datetime.now(UTC).isoformat(),
+            }
+        )
 
         try:
             result = self._client.publish(topic, payload, qos=1)
@@ -141,12 +147,14 @@ class MQTTClient:
             return
 
         topic = f"adaptivx/anomaly/{asset_id}"
-        payload = json.dumps({
-            "asset_id": asset_id,
-            "anomaly_score": anomaly_score,
-            "physics_residual": physics_residual,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        })
+        payload = json.dumps(
+            {
+                "asset_id": asset_id,
+                "anomaly_score": anomaly_score,
+                "physics_residual": physics_residual,
+                "timestamp": datetime.now(UTC).isoformat(),
+            }
+        )
 
         try:
             self._client.publish(topic, payload, qos=1)

@@ -10,12 +10,10 @@ from __future__ import annotations
 import logging
 import tempfile
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import httpx
-import numpy as np
 from fmpy import simulate_fmu
-from fmpy.util import download_file
 
 if TYPE_CHECKING:
     from adaptiv_monitor.basyx_client import BasyxClient
@@ -30,7 +28,7 @@ class FMURunner:
         self,
         minio_endpoint: str = "localhost:9000",
         minio_access_key: str = "adaptivx",
-        minio_secret_key: str = "adaptivx123",
+        minio_secret_key: str = "",
         minio_bucket: str = "adaptivx-fmu",
         cache_dir: str | None = None,
     ) -> None:
@@ -38,7 +36,9 @@ class FMURunner:
         self.minio_access_key = minio_access_key
         self.minio_secret_key = minio_secret_key
         self.minio_bucket = minio_bucket
-        self._cache_dir = Path(cache_dir) if cache_dir else Path(tempfile.gettempdir()) / "fmu_cache"
+        self._cache_dir = (
+            Path(cache_dir) if cache_dir else Path(tempfile.gettempdir()) / "fmu_cache"
+        )
         self._cache_dir.mkdir(parents=True, exist_ok=True)
         self._fmu_cache: dict[str, Path] = {}
 
@@ -108,7 +108,9 @@ class FMURunner:
         if not fmu_url:
             logger.warning(f"No FMU URL found for {asset_id}")
             # Try default location
-            fmu_url = f"http://{self.minio_endpoint}/{self.minio_bucket}/bearing_wear.fmu"
+            fmu_url = (
+                f"http://{self.minio_endpoint}/{self.minio_bucket}/bearing_wear.fmu"
+            )
 
         # Download FMU
         try:

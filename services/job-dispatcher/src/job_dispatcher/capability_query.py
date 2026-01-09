@@ -106,7 +106,7 @@ class CapabilityQueryService:
         )
 
         for item in results:
-            if isinstance(item, Exception):
+            if isinstance(item, BaseException):
                 logger.warning("Candidate fetch failed: %s", item)
                 continue
             asset_id, capability = item

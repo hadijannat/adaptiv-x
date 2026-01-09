@@ -82,7 +82,10 @@ class AASPatcher:
 
         response = await self._client.get(url)
         response.raise_for_status()
-        return response.json()
+        value: object = response.json()
+        if value is None:
+            return None
+        return str(value)
 
     async def patch_element(
         self, asset_id: str, element_path: str, value: str
