@@ -1,0 +1,279 @@
+{
+    "assetAdministrationShells": [
+        {
+            "modelType": "AssetAdministrationShell",
+            "id": "urn:adaptivx:aas:milling-02",
+            "idShort": "milling-02",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Digital Twin for CNC Milling Machine 02 with self-healing capabilities"
+                }
+            ],
+            "assetInformation": {
+                "assetKind": "Instance",
+                "globalAssetId": "urn:adaptivx:asset:milling-02",
+                "specificAssetIds": [
+                    {
+                        "name": "manufacturerPartId",
+                        "value": "MILL-CNC-5AXIS-002"
+                    },
+                    {
+                        "name": "serialNumber",
+                        "value": "SN-2024-001235"
+                    }
+                ],
+                "assetType": "urn:adaptivx:assettype:cnc-milling-machine"
+            },
+            "submodels": [
+                {
+                    "type": "ModelReference",
+                    "keys": [
+                        {
+                            "type": "Submodel",
+                            "value": "urn:adaptivx:submodel:health:milling-02"
+                        }
+                    ]
+                },
+                {
+                    "type": "ModelReference",
+                    "keys": [
+                        {
+                            "type": "Submodel",
+                            "value": "urn:adaptivx:submodel:capability:milling-02"
+                        }
+                    ]
+                },
+                {
+                    "type": "ModelReference",
+                    "keys": [
+                        {
+                            "type": "Submodel",
+                            "value": "urn:adaptivx:submodel:simulationmodels:milling-02"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "submodels": [
+        {
+            "modelType": "Submodel",
+            "kind": "Instance",
+            "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                    {
+                        "type": "GlobalReference",
+                        "value": "urn:adaptivx:submodel:health:1.0"
+                    }
+                ]
+            },
+            "id": "urn:adaptivx:submodel:health:milling-02",
+            "idShort": "Health",
+            "submodelElements": [
+                {
+                    "modelType": "Property",
+                    "idShort": "HealthIndex",
+                    "valueType": "xs:int",
+                    "value": "100"
+                },
+                {
+                    "modelType": "Property",
+                    "idShort": "HealthConfidence",
+                    "valueType": "xs:double",
+                    "value": "1.0"
+                },
+                {
+                    "modelType": "Property",
+                    "idShort": "AnomalyScore",
+                    "valueType": "xs:double",
+                    "value": "0.0"
+                },
+                {
+                    "modelType": "Property",
+                    "idShort": "PhysicsResidual",
+                    "valueType": "xs:double",
+                    "value": "0.0"
+                },
+                {
+                    "modelType": "Property",
+                    "idShort": "LastUpdate",
+                    "valueType": "xs:dateTime",
+                    "value": "2025-01-01T00:00:00Z"
+                },
+                {
+                    "modelType": "SubmodelElementCollection",
+                    "idShort": "ExplainabilityBundle",
+                    "value": [
+                        {
+                            "modelType": "Property",
+                            "idShort": "DecisionRationale",
+                            "valueType": "xs:string",
+                            "value": "Initial state: No anomalies detected."
+                        },
+                        {
+                            "modelType": "Property",
+                            "idShort": "ModelVersion",
+                            "valueType": "xs:string",
+                            "value": "anomaly-detector-v1.0.0"
+                        },
+                        {
+                            "modelType": "Property",
+                            "idShort": "FMUVersion",
+                            "valueType": "xs:string",
+                            "value": "bearing_wear-fmi2.0"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "modelType": "Submodel",
+            "kind": "Instance",
+            "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                    {
+                        "type": "GlobalReference",
+                        "value": "urn:adaptivx:submodel:capability:1.0"
+                    }
+                ]
+            },
+            "id": "urn:adaptivx:submodel:capability:milling-02",
+            "idShort": "Capabilities",
+            "submodelElements": [
+                {
+                    "modelType": "SubmodelElementCollection",
+                    "idShort": "ProcessCapability:Milling",
+                    "value": [
+                        {
+                            "modelType": "Property",
+                            "idShort": "SurfaceFinishGrade",
+                            "valueType": "xs:string",
+                            "value": "A"
+                        },
+                        {
+                            "modelType": "Property",
+                            "idShort": "ToleranceClass",
+                            "valueType": "xs:string",
+                            "value": "±0.02mm"
+                        },
+                        {
+                            "modelType": "Property",
+                            "idShort": "AssuranceState",
+                            "valueType": "xs:string",
+                            "value": "assured"
+                        },
+                        {
+                            "modelType": "Property",
+                            "idShort": "EnergyCostPerPart_kWh",
+                            "valueType": "xs:double",
+                            "value": "0.90"
+                        },
+                        {
+                            "modelType": "SubmodelElementCollection",
+                            "idShort": "Evidence",
+                            "value": [
+                                {
+                                    "modelType": "ReferenceElement",
+                                    "idShort": "HealthIndexLink",
+                                    "value": {
+                                        "type": "ModelReference",
+                                        "keys": [
+                                            {
+                                                "type": "Submodel",
+                                                "value": "urn:adaptivx:submodel:health:milling-02"
+                                            },
+                                            {
+                                                "type": "Property",
+                                                "value": "HealthIndex"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "modelType": "ReferenceElement",
+                                    "idShort": "SimulationModelLink",
+                                    "value": {
+                                        "type": "ModelReference",
+                                        "keys": [
+                                            {
+                                                "type": "Submodel",
+                                                "value": "urn:adaptivx:submodel:simulationmodels:milling-02"
+                                            },
+                                            {
+                                                "type": "SubmodelElementCollection",
+                                                "value": "SimulationModel:BearingWear"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "modelType": "Submodel",
+            "kind": "Instance",
+            "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                    {
+                        "type": "GlobalReference",
+                        "value": "https://admin-shell.io/idta/SimulationModels/1/0"
+                    }
+                ]
+            },
+            "id": "urn:adaptivx:submodel:simulationmodels:milling-02",
+            "idShort": "SimulationModels",
+            "submodelElements": [
+                {
+                    "modelType": "SubmodelElementCollection",
+                    "idShort": "SimulationModel:BearingWear",
+                    "value": [
+                        {
+                            "modelType": "Property",
+                            "idShort": "ModelName",
+                            "valueType": "xs:string",
+                            "value": "BearingWear"
+                        },
+                        {
+                            "modelType": "Property",
+                            "idShort": "ModelDescription",
+                            "valueType": "xs:string",
+                            "value": "Bearing wear physics model for vibration prediction"
+                        },
+                        {
+                            "modelType": "SubmodelElementCollection",
+                            "idShort": "ModelFile",
+                            "value": [
+                                {
+                                    "modelType": "SubmodelElementCollection",
+                                    "idShort": "ModelFileVersion",
+                                    "value": [
+                                        {
+                                            "modelType": "Property",
+                                            "idShort": "ModelVersionId",
+                                            "valueType": "xs:string",
+                                            "value": "1.0.0"
+                                        },
+                                        {
+                                            "modelType": "File",
+                                            "idShort": "DigitalFile",
+                                            "contentType": "application/zip",
+                                            "value": "http://minio:9000/adaptivx-fmu/bearing_wear.fmu"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "conceptDescriptions": []
+}

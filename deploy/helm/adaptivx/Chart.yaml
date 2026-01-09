@@ -1,0 +1,21 @@
+apiVersion: v2
+name: adaptivx
+description: Capability-Based Self-Healing Industrial Digital Twin
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - digital-twin
+  - aas
+  - industry-4.0
+  - self-healing
+maintainers:
+  - name: Adaptiv-X Team
+home: https://github.com/adaptiv-x/self-healing-aas
+sources:
+  - https://github.com/adaptiv-x/self-healing-aas
+dependencies:
+  - name: mosquitto
+    version: "2.x.x"
+    repository: https://k8s-at-home.com/charts/
+    condition: mosquitto.enabled

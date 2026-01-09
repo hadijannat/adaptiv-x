@@ -1,0 +1,56 @@
+# Adaptiv-X Capability Downgrade Policy
+#
+# Defines health-to-capability mapping rules following German
+# capability-based engineering semantics.
+#
+# States:
+#   assured     - Capability guaranteed at specified quality
+#   offered     - Capability available but not guaranteed
+#   notAvailable - Capability degraded/unavailable
+
+rules:
+  # ============================================================================
+  # SEVERE DEGRADATION: Health < 80
+  # Asset requires maintenance, remove from precision work
+  # ============================================================================
+  - when: "health < 80"
+    priority: 10
+    actions:
+      - path: "Capabilities/ProcessCapability:Milling/AssuranceState"
+        value: "notAvailable"
+      - path: "Capabilities/ProcessCapability:Milling/SurfaceFinishGrade"
+        value: "C"
+      - path: "Capabilities/ProcessCapability:Milling/ToleranceClass"
+        value: "±0.05mm"
+      - path: "Capabilities/ProcessCapability:Milling/EnergyCostPerPart_kWh"
+        value: "1.25"
+
+  # ============================================================================
+  # MODERATE DEGRADATION: 80 <= Health < 90
+  # Quality offered but not assured, may be used for less critical work
+  # ============================================================================
+  - when: "health < 90"
+    priority: 5
+    actions:
+      - path: "Capabilities/ProcessCapability:Milling/AssuranceState"
+        value: "offered"
+      - path: "Capabilities/ProcessCapability:Milling/SurfaceFinishGrade"
+        value: "B"
+      - path: "Capabilities/ProcessCapability:Milling/EnergyCostPerPart_kWh"
+        value: "1.0"
+
+  # ============================================================================
+  # HEALTHY: Health >= 90
+  # Full capability assurance
+  # ============================================================================
+  - when: "health >= 90"
+    priority: 1
+    actions:
+      - path: "Capabilities/ProcessCapability:Milling/AssuranceState"
+        value: "assured"
+      - path: "Capabilities/ProcessCapability:Milling/SurfaceFinishGrade"
+        value: "A"
+      - path: "Capabilities/ProcessCapability:Milling/ToleranceClass"
+        value: "±0.02mm"
+      - path: "Capabilities/ProcessCapability:Milling/EnergyCostPerPart_kWh"
+        value: "0.85"

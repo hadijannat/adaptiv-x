@@ -1,0 +1,244 @@
+{
+    "realm": "adaptivx",
+    "enabled": true,
+    "displayName": "Adaptiv-X",
+    "displayNameHtml": "<strong>Adaptiv-X</strong> Self-Healing Digital Twin",
+    "sslRequired": "external",
+    "registrationAllowed": false,
+    "loginWithEmailAllowed": true,
+    "duplicateEmailsAllowed": false,
+    "resetPasswordAllowed": true,
+    "editUsernameAllowed": false,
+    "bruteForceProtected": true,
+    "permanentLockout": false,
+    "maxFailureWaitSeconds": 900,
+    "minimumQuickLoginWaitSeconds": 60,
+    "waitIncrementSeconds": 60,
+    "quickLoginCheckMilliSeconds": 1000,
+    "maxDeltaTimeSeconds": 43200,
+    "failureFactor": 5,
+    "roles": {
+        "realm": [
+            {
+                "name": "adaptivx-admin",
+                "description": "Full administrative access to Adaptiv-X",
+                "composite": false
+            },
+            {
+                "name": "adaptivx-operator",
+                "description": "Can monitor and dispatch jobs, but cannot modify policies",
+                "composite": false
+            },
+            {
+                "name": "adaptivx-viewer",
+                "description": "Read-only access to health and capability data",
+                "composite": false
+            }
+        ]
+    },
+    "groups": [
+        {
+            "name": "administrators",
+            "path": "/administrators",
+            "realmRoles": [
+                "adaptivx-admin"
+            ]
+        },
+        {
+            "name": "operators",
+            "path": "/operators",
+            "realmRoles": [
+                "adaptivx-operator"
+            ]
+        },
+        {
+            "name": "viewers",
+            "path": "/viewers",
+            "realmRoles": [
+                "adaptivx-viewer"
+            ]
+        }
+    ],
+    "clients": [
+        {
+            "clientId": "adaptivx-dashboard",
+            "name": "Adaptiv-X Dashboard",
+            "description": "Web dashboard for Adaptiv-X monitoring",
+            "enabled": true,
+            "publicClient": true,
+            "standardFlowEnabled": true,
+            "directAccessGrantsEnabled": false,
+            "implicitFlowEnabled": false,
+            "protocol": "openid-connect",
+            "rootUrl": "http://localhost:3000",
+            "baseUrl": "/",
+            "redirectUris": [
+                "http://localhost:3000/*",
+                "https://adaptivx.local/*"
+            ],
+            "webOrigins": [
+                "http://localhost:3000",
+                "https://adaptivx.local"
+            ],
+            "defaultClientScopes": [
+                "openid",
+                "profile",
+                "email",
+                "roles"
+            ],
+            "optionalClientScopes": []
+        },
+        {
+            "clientId": "adaptivx-services",
+            "name": "Adaptiv-X Microservices",
+            "description": "Service-to-service authentication",
+            "enabled": true,
+            "publicClient": false,
+            "serviceAccountsEnabled": true,
+            "standardFlowEnabled": false,
+            "directAccessGrantsEnabled": true,
+            "protocol": "openid-connect",
+            "secret": "adaptivx-services-secret",
+            "defaultClientScopes": [
+                "openid",
+                "profile",
+                "roles"
+            ]
+        },
+        {
+            "clientId": "aas-environment",
+            "name": "BaSyx AAS Environment",
+            "description": "AAS Environment service client",
+            "enabled": true,
+            "publicClient": false,
+            "serviceAccountsEnabled": true,
+            "standardFlowEnabled": false,
+            "directAccessGrantsEnabled": true,
+            "protocol": "openid-connect",
+            "secret": "aas-environment-secret"
+        }
+    ],
+    "clientScopes": [
+        {
+            "name": "roles",
+            "description": "OpenID Connect scope for roles",
+            "protocol": "openid-connect",
+            "attributes": {
+                "include.in.token.scope": "true",
+                "display.on.consent.screen": "true"
+            },
+            "protocolMappers": [
+                {
+                    "name": "realm roles",
+                    "protocol": "openid-connect",
+                    "protocolMapper": "oidc-usermodel-realm-role-mapper",
+                    "consentRequired": false,
+                    "config": {
+                        "multivalued": "true",
+                        "userinfo.token.claim": "true",
+                        "id.token.claim": "true",
+                        "access.token.claim": "true",
+                        "claim.name": "roles",
+                        "jsonType.label": "String"
+                    }
+                }
+            ]
+        }
+    ],
+    "users": [
+        {
+            "username": "admin",
+            "enabled": true,
+            "email": "admin@adaptivx.local",
+            "emailVerified": true,
+            "firstName": "Admin",
+            "lastName": "User",
+            "credentials": [
+                {
+                    "type": "password",
+                    "value": "admin",
+                    "temporary": true
+                }
+            ],
+            "realmRoles": [
+                "adaptivx-admin"
+            ],
+            "groups": [
+                "/administrators"
+            ]
+        },
+        {
+            "username": "operator",
+            "enabled": true,
+            "email": "operator@adaptivx.local",
+            "emailVerified": true,
+            "firstName": "Operator",
+            "lastName": "User",
+            "credentials": [
+                {
+                    "type": "password",
+                    "value": "operator",
+                    "temporary": true
+                }
+            ],
+            "realmRoles": [
+                "adaptivx-operator"
+            ],
+            "groups": [
+                "/operators"
+            ]
+        },
+        {
+            "username": "viewer",
+            "enabled": true,
+            "email": "viewer@adaptivx.local",
+            "emailVerified": true,
+            "firstName": "Viewer",
+            "lastName": "User",
+            "credentials": [
+                {
+                    "type": "password",
+                    "value": "viewer",
+                    "temporary": true
+                }
+            ],
+            "realmRoles": [
+                "adaptivx-viewer"
+            ],
+            "groups": [
+                "/viewers"
+            ]
+        }
+    ],
+    "components": {
+        "org.keycloak.keys.KeyProvider": [
+            {
+                "name": "rsa-generated",
+                "providerId": "rsa-generated",
+                "config": {
+                    "priority": [
+                        "100"
+                    ],
+                    "keySize": [
+                        "2048"
+                    ]
+                }
+            }
+        ]
+    },
+    "internationalizationEnabled": true,
+    "supportedLocales": [
+        "en",
+        "de"
+    ],
+    "defaultLocale": "en",
+    "browserSecurityHeaders": {
+        "contentSecurityPolicyReportOnly": "",
+        "xContentTypeOptions": "nosniff",
+        "xRobotsTag": "none",
+        "xFrameOptions": "SAMEORIGIN",
+        "contentSecurityPolicy": "frame-src 'self'; frame-ancestors 'self'; object-src 'none';",
+        "xXSSProtection": "1; mode=block",
+        "strictTransportSecurity": "max-age=31536000; includeSubDomains"
+    }
+}

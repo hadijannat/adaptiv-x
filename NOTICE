@@ -1,0 +1,39 @@
+Adaptiv-X
+Copyright 2025 Adaptiv-X Contributors
+
+This product includes software developed as an independent reference
+implementation for capability-based self-healing Industrial Digital Twins.
+
+This project is not affiliated with Manufacturing-X, Catena-X, IDTA, or
+any "-X alliance" initiative.
+
+Third-Party Dependencies
+========================
+
+Eclipse BaSyx
+  - License: MIT
+  - https://github.com/eclipse-basyx/basyx-java-server-sdk
+
+FMPy
+  - License: BSD 2-Clause
+  - https://github.com/CATIA-Systems/FMPy
+
+PyTorch
+  - License: BSD-style
+  - https://github.com/pytorch/pytorch
+
+FastAPI
+  - License: MIT
+  - https://github.com/tiangolo/fastapi
+
+React
+  - License: MIT
+  - https://github.com/facebook/react
+
+Material-UI
+  - License: MIT
+  - https://github.com/mui/material-ui
+
+Redux Toolkit
+  - License: MIT
+  - https://github.com/reduxjs/redux-toolkit

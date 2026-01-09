@@ -1,0 +1,218 @@
+{
+    "modelType": "Submodel",
+    "kind": "Instance",
+    "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+            {
+                "type": "GlobalReference",
+                "value": "urn:adaptivx:submodel:capability:1.0"
+            }
+        ]
+    },
+    "id": "urn:adaptivx:submodel:capability:milling-01",
+    "idShort": "Capabilities",
+    "description": [
+        {
+            "language": "en",
+            "text": "Capability description submodel aligned with German capability-based engineering"
+        },
+        {
+            "language": "de",
+            "text": "Fähigkeitsbeschreibungs-Teilmodell nach deutschem Capability-Based Engineering"
+        }
+    ],
+    "submodelElements": [
+        {
+            "modelType": "SubmodelElementCollection",
+            "idShort": "ProcessCapability:Milling",
+            "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                    {
+                        "type": "GlobalReference",
+                        "value": "0173-1#01-AKJ975#017"
+                    }
+                ]
+            },
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Milling process capability with quality grades and assurance state"
+                }
+            ],
+            "value": [
+                {
+                    "modelType": "Property",
+                    "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "0173-1#02-AAG920#004"
+                            }
+                        ]
+                    },
+                    "idShort": "SurfaceFinishGrade",
+                    "description": [
+                        {
+                            "language": "en",
+                            "text": "Achievable surface finish quality grade"
+                        }
+                    ],
+                    "valueType": "xs:string",
+                    "value": "A"
+                },
+                {
+                    "modelType": "Property",
+                    "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "0173-1#02-AAE583#006"
+                            }
+                        ]
+                    },
+                    "idShort": "ToleranceClass",
+                    "description": [
+                        {
+                            "language": "en",
+                            "text": "Dimensional tolerance class specification"
+                        }
+                    ],
+                    "valueType": "xs:string",
+                    "value": "±0.02mm"
+                },
+                {
+                    "modelType": "Property",
+                    "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "urn:adaptivx:concept:assurancestate:1.0"
+                            }
+                        ]
+                    },
+                    "idShort": "AssuranceState",
+                    "description": [
+                        {
+                            "language": "en",
+                            "text": "Capability assurance state: assured, offered, or notAvailable"
+                        },
+                        {
+                            "language": "de",
+                            "text": "Fähigkeitszusicherungsstatus: zugesichert, angeboten, oder nicht verfügbar"
+                        }
+                    ],
+                    "valueType": "xs:string",
+                    "value": "assured"
+                },
+                {
+                    "modelType": "Property",
+                    "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "0173-1#02-AAT812#001"
+                            }
+                        ]
+                    },
+                    "idShort": "EnergyCostPerPart_kWh",
+                    "description": [
+                        {
+                            "language": "en",
+                            "text": "Energy consumption per manufactured part in kWh"
+                        }
+                    ],
+                    "valueType": "xs:double",
+                    "value": "0.85"
+                },
+                {
+                    "modelType": "Property",
+                    "idShort": "MaxSpindleSpeed_rpm",
+                    "description": [
+                        {
+                            "language": "en",
+                            "text": "Maximum spindle speed in revolutions per minute"
+                        }
+                    ],
+                    "valueType": "xs:int",
+                    "value": "24000"
+                },
+                {
+                    "modelType": "Property",
+                    "idShort": "MaxFeedRate_mmPerMin",
+                    "description": [
+                        {
+                            "language": "en",
+                            "text": "Maximum feed rate in mm/min"
+                        }
+                    ],
+                    "valueType": "xs:int",
+                    "value": "15000"
+                },
+                {
+                    "modelType": "SubmodelElementCollection",
+                    "idShort": "Evidence",
+                    "description": [
+                        {
+                            "language": "en",
+                            "text": "Evidence references linking capability state to health and simulation data"
+                        }
+                    ],
+                    "value": [
+                        {
+                            "modelType": "ReferenceElement",
+                            "idShort": "HealthIndexLink",
+                            "description": [
+                                {
+                                    "language": "en",
+                                    "text": "Reference to current health index value"
+                                }
+                            ],
+                            "value": {
+                                "type": "ModelReference",
+                                "keys": [
+                                    {
+                                        "type": "Submodel",
+                                        "value": "urn:adaptivx:submodel:health:milling-01"
+                                    },
+                                    {
+                                        "type": "Property",
+                                        "value": "HealthIndex"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "modelType": "ReferenceElement",
+                            "idShort": "SimulationModelLink",
+                            "description": [
+                                {
+                                    "language": "en",
+                                    "text": "Reference to simulation model for physics-based validation"
+                                }
+                            ],
+                            "value": {
+                                "type": "ModelReference",
+                                "keys": [
+                                    {
+                                        "type": "Submodel",
+                                        "value": "urn:adaptivx:submodel:simulationmodels:milling-01"
+                                    },
+                                    {
+                                        "type": "SubmodelElementCollection",
+                                        "value": "SimulationModel:BearingWear"
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

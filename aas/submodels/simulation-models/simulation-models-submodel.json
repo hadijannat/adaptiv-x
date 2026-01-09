@@ -1,0 +1,252 @@
+{
+    "modelType": "Submodel",
+    "kind": "Instance",
+    "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+            {
+                "type": "GlobalReference",
+                "value": "https://admin-shell.io/idta/SimulationModels/1/0"
+            }
+        ]
+    },
+    "id": "urn:adaptivx:submodel:simulationmodels:milling-01",
+    "idShort": "SimulationModels",
+    "description": [
+        {
+            "language": "en",
+            "text": "Simulation Models submodel according to IDTA 02005 template"
+        },
+        {
+            "language": "de",
+            "text": "Simulationsmodelle-Teilmodell nach IDTA 02005 Vorlage"
+        }
+    ],
+    "submodelElements": [
+        {
+            "modelType": "SubmodelElementCollection",
+            "idShort": "SimulationModel:BearingWear",
+            "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                    {
+                        "type": "GlobalReference",
+                        "value": "https://admin-shell.io/idta/SimulationModels/SimulationModel/1/0"
+                    }
+                ]
+            },
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Bearing wear physics model for vibration prediction and plausibility checking"
+                }
+            ],
+            "value": [
+                {
+                    "modelType": "Property",
+                    "idShort": "ModelName",
+                    "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "0173-1#02-AAO677#002"
+                            }
+                        ]
+                    },
+                    "valueType": "xs:string",
+                    "value": "BearingWear"
+                },
+                {
+                    "modelType": "Property",
+                    "idShort": "ModelDescription",
+                    "valueType": "xs:string",
+                    "value": "Physics-based model correlating spindle speed, load, and wear level to expected vibration RMS and power loss"
+                },
+                {
+                    "modelType": "Property",
+                    "idShort": "ModelPurpose",
+                    "valueType": "xs:string",
+                    "value": "Plausibility check for ML anomaly detection; expected vs actual vibration comparison"
+                },
+                {
+                    "modelType": "SubmodelElementCollection",
+                    "idShort": "ModelFile",
+                    "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/idta/SimulationModels/ModelFile/1/0"
+                            }
+                        ]
+                    },
+                    "value": [
+                        {
+                            "modelType": "SubmodelElementCollection",
+                            "idShort": "ModelFileVersion",
+                            "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                    {
+                                        "type": "GlobalReference",
+                                        "value": "https://admin-shell.io/idta/SimulationModels/ModelFileVersion/1/0"
+                                    }
+                                ]
+                            },
+                            "value": [
+                                {
+                                    "modelType": "Property",
+                                    "idShort": "ModelVersionId",
+                                    "valueType": "xs:string",
+                                    "value": "1.0.0"
+                                },
+                                {
+                                    "modelType": "File",
+                                    "idShort": "DigitalFile",
+                                    "semanticId": {
+                                        "type": "ExternalReference",
+                                        "keys": [
+                                            {
+                                                "type": "GlobalReference",
+                                                "value": "https://admin-shell.io/idta/SimulationModels/DigitalFile/1/0"
+                                            }
+                                        ]
+                                    },
+                                    "description": [
+                                        {
+                                            "language": "en",
+                                            "text": "FMU file (FMI 2.0 Co-Simulation) for bearing wear simulation"
+                                        }
+                                    ],
+                                    "contentType": "application/zip",
+                                    "value": "http://minio:9000/adaptivx-fmu/bearing_wear.fmu"
+                                },
+                                {
+                                    "modelType": "Property",
+                                    "idShort": "ReleaseNotes",
+                                    "valueType": "xs:string",
+                                    "value": "Initial release: Simple linear model for vibration RMS correlation with wear level"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "modelType": "SubmodelElementCollection",
+                    "idShort": "SimulationToolInfo",
+                    "value": [
+                        {
+                            "modelType": "Property",
+                            "idShort": "SimulationToolName",
+                            "valueType": "xs:string",
+                            "value": "OpenModelica"
+                        },
+                        {
+                            "modelType": "Property",
+                            "idShort": "SimulationToolVersion",
+                            "valueType": "xs:string",
+                            "value": "1.21.0"
+                        },
+                        {
+                            "modelType": "Property",
+                            "idShort": "FMIVersion",
+                            "valueType": "xs:string",
+                            "value": "2.0"
+                        },
+                        {
+                            "modelType": "Property",
+                            "idShort": "FMUType",
+                            "valueType": "xs:string",
+                            "value": "CoSimulation"
+                        }
+                    ]
+                },
+                {
+                    "modelType": "SubmodelElementCollection",
+                    "idShort": "ModelInterface",
+                    "description": [
+                        {
+                            "language": "en",
+                            "text": "Input/output interface specification for the simulation model"
+                        }
+                    ],
+                    "value": [
+                        {
+                            "modelType": "SubmodelElementCollection",
+                            "idShort": "Inputs",
+                            "value": [
+                                {
+                                    "modelType": "Property",
+                                    "idShort": "omega",
+                                    "description": [
+                                        {
+                                            "language": "en",
+                                            "text": "Spindle angular velocity [rad/s]"
+                                        }
+                                    ],
+                                    "valueType": "xs:double",
+                                    "value": "0.0"
+                                },
+                                {
+                                    "modelType": "Property",
+                                    "idShort": "load",
+                                    "description": [
+                                        {
+                                            "language": "en",
+                                            "text": "Cutting load [N]"
+                                        }
+                                    ],
+                                    "valueType": "xs:double",
+                                    "value": "0.0"
+                                },
+                                {
+                                    "modelType": "Property",
+                                    "idShort": "wear",
+                                    "description": [
+                                        {
+                                            "language": "en",
+                                            "text": "Wear level [0-1]"
+                                        }
+                                    ],
+                                    "valueType": "xs:double",
+                                    "value": "0.0"
+                                }
+                            ]
+                        },
+                        {
+                            "modelType": "SubmodelElementCollection",
+                            "idShort": "Outputs",
+                            "value": [
+                                {
+                                    "modelType": "Property",
+                                    "idShort": "vib_rms_expected",
+                                    "description": [
+                                        {
+                                            "language": "en",
+                                            "text": "Expected RMS vibration [mm/s]"
+                                        }
+                                    ],
+                                    "valueType": "xs:double",
+                                    "value": "0.0"
+                                },
+                                {
+                                    "modelType": "Property",
+                                    "idShort": "power_loss_expected",
+                                    "description": [
+                                        {
+                                            "language": "en",
+                                            "text": "Expected power loss [W]"
+                                        }
+                                    ],
+                                    "valueType": "xs:double",
+                                    "value": "0.0"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

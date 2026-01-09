@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Adaptiv-X: Capability-Based Self-Healing for Industrial Digital Twins"
+version: 0.1.0
+date-released: 2025-01-01
+url: "https://github.com/adaptiv-x/self-healing-aas"
+repository-code: "https://github.com/adaptiv-x/self-healing-aas"
+license: Apache-2.0
+keywords:
+  - digital-twin
+  - asset-administration-shell
+  - self-healing
+  - industry-4.0
+  - capability-based-engineering
+  - fmi
+  - fmu
+abstract: >-
+  A deployment-ready reference implementation of a cognitive Industrial
+  Digital Twin that actively renegotiates its own skills at runtime based
+  on continuously re-evaluated health and feasibility. Implements hybrid AI
+  (ML + FMU physics), semantic capability reasoning, and VDI/VDE 2193-inspired
+  bidding for capability-based production routing.
+authors:
+  - family-names: "Adaptiv-X"
+    given-names: "Team"

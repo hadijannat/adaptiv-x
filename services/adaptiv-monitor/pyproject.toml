@@ -1,0 +1,53 @@
+[tool.poetry]
+name = "adaptiv-monitor"
+version = "0.1.0"
+description = "Hybrid AI health monitoring service for Adaptiv-X self-healing digital twin"
+authors = ["Adaptiv-X Team"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [{include = "adaptiv_monitor", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.109.0"
+uvicorn = {extras = ["standard"], version = "^0.27.0"}
+pydantic = "^2.6.0"
+pydantic-settings = "^2.1.0"
+httpx = "^0.26.0"
+paho-mqtt = "^2.0.0"
+fmpy = "^0.3.20"
+numpy = "^1.26.0"
+torch = "^2.1.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+pytest-asyncio = "^0.23.0"
+pytest-cov = "^4.1.0"
+ruff = "^0.2.0"
+mypy = "^1.8.0"
+bandit = "^1.7.7"
+httpx = "^0.26.0"
+
+[tool.poetry.scripts]
+adaptiv-monitor = "adaptiv_monitor.main:run"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "PTH", "S"]
+ignore = ["S101"] # Allow assert for tests
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,51 @@
+[tool.poetry]
+name = "skill-broker"
+version = "0.1.0"
+description = "Semantic capability reasoning service for Adaptiv-X self-healing digital twin"
+authors = ["Adaptiv-X Team"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [{include = "skill_broker", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.109.0"
+uvicorn = {extras = ["standard"], version = "^0.27.0"}
+pydantic = "^2.6.0"
+pydantic-settings = "^2.1.0"
+httpx = "^0.26.0"
+paho-mqtt = "^2.0.0"
+pyyaml = "^6.0.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+pytest-asyncio = "^0.23.0"
+pytest-cov = "^4.1.0"
+ruff = "^0.2.0"
+mypy = "^1.8.0"
+bandit = "^1.7.7"
+types-PyYAML = "^6.0.12"
+
+[tool.poetry.scripts]
+skill-broker = "skill_broker.main:run"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "PTH", "S"]
+ignore = ["S101"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

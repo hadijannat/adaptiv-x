@@ -1,0 +1,14 @@
+{
+  "coefficients": {
+    "base": 0.5,
+    "k1": 0.001,
+    "k2": 0.002
+  },
+  "thresholds": {
+    "vib_rms": 3.0,
+    "factor": 2.0,
+    "zscore": 3.0,
+    "min_samples": 20,
+    "window_size": 200
+  }
+}

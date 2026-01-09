@@ -1,0 +1,212 @@
+{
+    "conceptDescriptions": [
+        {
+            "modelType": "ConceptDescription",
+            "id": "urn:adaptivx:concept:assurancestate:1.0",
+            "idShort": "AssuranceState",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Capability assurance state following German capability-based engineering semantics"
+                },
+                {
+                    "language": "de",
+                    "text": "Fähigkeitszusicherungsstatus nach deutschem Capability-Based Engineering"
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Assurance State"
+                            },
+                            {
+                                "language": "de",
+                                "text": "Zusicherungsstatus"
+                            }
+                        ],
+                        "definition": [
+                            {
+                                "language": "en",
+                                "text": "Indicates whether a capability is: 'assured' (guaranteed quality), 'offered' (available but not guaranteed), or 'notAvailable' (degraded/unavailable)"
+                            }
+                        ],
+                        "dataType": "STRING",
+                        "valueList": {
+                            "valueReferencePairs": [
+                                {
+                                    "value": "assured",
+                                    "valueId": {
+                                        "type": "ExternalReference",
+                                        "keys": [
+                                            {
+                                                "type": "GlobalReference",
+                                                "value": "urn:adaptivx:value:assurancestate:assured"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "value": "offered",
+                                    "valueId": {
+                                        "type": "ExternalReference",
+                                        "keys": [
+                                            {
+                                                "type": "GlobalReference",
+                                                "value": "urn:adaptivx:value:assurancestate:offered"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "value": "notAvailable",
+                                    "valueId": {
+                                        "type": "ExternalReference",
+                                        "keys": [
+                                            {
+                                                "type": "GlobalReference",
+                                                "value": "urn:adaptivx:value:assurancestate:notAvailable"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "urn:adaptivx:concept:healthconfidence:1.0",
+            "idShort": "HealthConfidence",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Confidence level of health assessment derived from ML and physics fusion"
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Health Confidence"
+                            }
+                        ],
+                        "definition": [
+                            {
+                                "language": "en",
+                                "text": "Normalized confidence value (0.0-1.0) indicating reliability of health index assessment"
+                            }
+                        ],
+                        "dataType": "REAL_MEASURE",
+                        "levelType": {
+                            "min": true,
+                            "max": true
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "urn:adaptivx:concept:anomalyscore:1.0",
+            "idShort": "AnomalyScore",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Machine learning based anomaly detection score"
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Anomaly Score"
+                            }
+                        ],
+                        "definition": [
+                            {
+                                "language": "en",
+                                "text": "Normalized score (0.0=normal, 1.0=anomalous) from ML-based anomaly detection"
+                            }
+                        ],
+                        "dataType": "REAL_MEASURE"
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "urn:adaptivx:concept:physicsresidual:1.0",
+            "idShort": "PhysicsResidual",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Physics model residual indicating deviation from expected behavior"
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Physics Residual"
+                            }
+                        ],
+                        "definition": [
+                            {
+                                "language": "en",
+                                "text": "Normalized residual (0.0=matches physics model, 1.0=severe deviation) from FMU simulation"
+                            }
+                        ],
+                        "dataType": "REAL_MEASURE"
+                    }
+                }
+            ]
+        }
+    ]
+}

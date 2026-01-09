@@ -1,0 +1,230 @@
+# Adaptiv-X Helm Chart Values
+# Default configuration for all components
+
+# Global settings
+global:
+  imageRegistry: ghcr.io
+  imagePullSecrets: []
+  storageClass: ""
+
+# ============================================================================
+# BaSyx AAS Infrastructure
+# ============================================================================
+aasEnvironment:
+  enabled: true
+  image:
+    repository: eclipsebasyx/aas-environment
+    tag: "2.0.0-milestone-03"
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  service:
+    type: ClusterIP
+    port: 8081
+  env:
+    BASYX_CORS_ALLOWED_ORIGINS: "*"
+    BASYX_CORS_ALLOWED_METHODS: "*"
+
+aasRegistry:
+  enabled: true
+  image:
+    repository: eclipsebasyx/aas-registry-log-mem
+    tag: "2.0.0-milestone-03"
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  service:
+    type: ClusterIP
+    port: 8080
+
+submodelRegistry:
+  enabled: true
+  image:
+    repository: eclipsebasyx/submodel-registry-log-mem
+    tag: "2.0.0-milestone-03"
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  service:
+    type: ClusterIP
+    port: 8080
+
+# ============================================================================
+# Adaptiv-X Microservices
+# ============================================================================
+adaptivMonitor:
+  enabled: true
+  image:
+    repository: adaptivx/adaptiv-monitor
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  service:
+    type: ClusterIP
+    port: 8000
+  env:
+    AAS_ENVIRONMENT_URL: http://aas-environment:8081
+    AAS_REGISTRY_URL: http://aas-registry:8080
+    SUBMODEL_REGISTRY_URL: http://submodel-registry:8080
+    MQTT_BROKER_HOST: mosquitto
+    MQTT_BROKER_PORT: "1883"
+    MINIO_ENDPOINT: minio:9000
+
+skillBroker:
+  enabled: true
+  image:
+    repository: adaptivx/skill-broker
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  service:
+    type: ClusterIP
+    port: 8000
+  env:
+    AAS_ENVIRONMENT_URL: http://aas-environment:8081
+    MQTT_BROKER_HOST: mosquitto
+    MQTT_BROKER_PORT: "1883"
+
+jobDispatcher:
+  enabled: true
+  image:
+    repository: adaptivx/job-dispatcher
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  service:
+    type: ClusterIP
+    port: 8000
+  env:
+    AAS_ENVIRONMENT_URL: http://aas-environment:8081
+    AAS_REGISTRY_URL: http://aas-registry:8080
+
+dashboard:
+  enabled: true
+  image:
+    repository: adaptivx/dashboard
+    tag: "0.1.0"
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "128Mi"
+      cpu: "200m"
+  service:
+    type: ClusterIP
+    port: 80
+
+# ============================================================================
+# Infrastructure Dependencies
+# ============================================================================
+mosquitto:
+  enabled: true
+  image:
+    repository: eclipse-mosquitto
+    tag: "2"
+  service:
+    type: ClusterIP
+    port: 1883
+    websocketPort: 9001
+
+minio:
+  enabled: true
+  image:
+    repository: minio/minio
+    tag: "latest"
+  rootUser: adaptivx
+  rootPassword: adaptivx123
+  defaultBuckets: adaptivx-fmu
+  persistence:
+    enabled: false
+    size: 1Gi
+  service:
+    type: ClusterIP
+    port: 9000
+    consolePort: 9001
+
+# ============================================================================
+# Security (Keycloak)
+# ============================================================================
+keycloak:
+  enabled: false
+  image:
+    repository: quay.io/keycloak/keycloak
+    tag: "23.0"
+  adminUser: admin
+  adminPassword: admin
+  service:
+    type: ClusterIP
+    port: 8080
+  realm:
+    name: adaptivx
+    importOnStartup: true
+
+# ============================================================================
+# Ingress
+# ============================================================================
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+  hosts:
+    - host: adaptivx.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service: dashboard
+        - path: /api/monitor
+          pathType: Prefix
+          service: adaptiv-monitor
+        - path: /api/broker
+          pathType: Prefix
+          service: skill-broker
+        - path: /api/dispatcher
+          pathType: Prefix
+          service: job-dispatcher
+        - path: /aas
+          pathType: Prefix
+          service: aas-environment
+  tls: []

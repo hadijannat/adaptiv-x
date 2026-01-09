@@ -1,0 +1,240 @@
+# Adaptiv-X Docker Compose Stack
+# Infrastructure for capability-based self-healing Industrial Digital Twin
+
+services:
+  # ============================================================================
+  # BaSyx AAS Environment v2 - Main AAS Repository
+  # ============================================================================
+  aas-environment:
+    image: eclipsebasyx/aas-environment:2.0.0-milestone-03
+    container_name: adaptivx-aas-env
+    ports:
+      - "4001:8081"
+    environment:
+      BASYX_AASREPOSITORY_FEATURE_REGISTRYINTEGRATION: "http://aas-registry:8080"
+      BASYX_SUBMODELREPOSITORY_FEATURE_REGISTRYINTEGRATION: "http://submodel-registry:8080"
+      # Disable MQTT for faster startup (can be enabled later)
+      BASYX_AASREPOSITORY_FEATURE_MQTT_ENABLED: "false"
+      BASYX_SUBMODELREPOSITORY_FEATURE_MQTT_ENABLED: "false"
+      BASYX_CORS_ALLOWED_ORIGINS: "*"
+      BASYX_CORS_ALLOWED_METHODS: "GET,POST,PATCH,PUT,DELETE,OPTIONS,HEAD"
+    volumes:
+      - aas-data:/application/aas
+    depends_on:
+      - aas-registry
+      - submodel-registry
+      - mosquitto
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/shells" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - adaptivx-net
+
+  # ============================================================================
+  # BaSyx AAS Registry - Discovery for AAS Descriptors
+  # ============================================================================
+  aas-registry:
+    image: eclipsebasyx/aas-registry-log-mem:2.0.0-milestone-03
+    container_name: adaptivx-aas-registry
+    ports:
+      - "4000:8080"
+    environment:
+      BASYX_CORS_ALLOWED_ORIGINS: "*"
+      BASYX_CORS_ALLOWED_METHODS: "GET,POST,PATCH,PUT,DELETE,OPTIONS,HEAD"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/shell-descriptors" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - adaptivx-net
+
+  # ============================================================================
+  # BaSyx Submodel Registry - Discovery for Submodel Descriptors
+  # ============================================================================
+  submodel-registry:
+    image: eclipsebasyx/submodel-registry-log-mem:2.0.0-milestone-03
+    container_name: adaptivx-submodel-registry
+    ports:
+      - "4002:8080"
+    environment:
+      BASYX_CORS_ALLOWED_ORIGINS: "*"
+      BASYX_CORS_ALLOWED_METHODS: "GET,POST,PATCH,PUT,DELETE,OPTIONS,HEAD"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/submodel-descriptors" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - adaptivx-net
+
+  # ============================================================================
+  # Mosquitto MQTT Broker - Event Bus
+  # ============================================================================
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: adaptivx-mosquitto
+    ports:
+      - "1883:1883"
+      - "9883:9001"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto-data:/mosquitto/data
+      - mosquitto-log:/mosquitto/log
+    healthcheck:
+      test: [ "CMD", "mosquitto_sub", "-t", "$$SYS/#", "-C", "1", "-i", "healthcheck", "-W", "3" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - adaptivx-net
+
+  # ============================================================================
+  # MinIO - S3-Compatible Object Storage for FMU Files
+  # ============================================================================
+  minio:
+    image: minio/minio:latest
+    container_name: adaptivx-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9010:9000"
+      - "9011:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-adaptivx}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-adaptivx123}
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: [ "CMD", "mc", "ready", "local" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - adaptivx-net
+
+  # ============================================================================
+  # MinIO Client - Bucket Initialization
+  # ============================================================================
+  minio-init:
+    image: minio/mc:latest
+    container_name: adaptivx-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c " mc alias set myminio http://minio:9000 $${MINIO_ROOT_USER:-adaptivx} $${MINIO_ROOT_PASSWORD:-adaptivx123}; mc mb myminio/adaptivx-fmu --ignore-existing; mc anonymous set download myminio/adaptivx-fmu; echo 'Bucket adaptivx-fmu created and configured'; exit 0; "
+    networks:
+      - adaptivx-net
+  # ============================================================================
+  # Adaptiv-X Services (uncomment when built)
+  # ============================================================================
+
+  # adaptiv-monitor:
+  #   build:
+  #     context: ../../services/adaptiv-monitor
+  #     dockerfile: Dockerfile
+  #   container_name: adaptivx-monitor
+  #   ports:
+  #     - "8011:8000"
+  #   environment:
+  #     AAS_ENVIRONMENT_URL: http://aas-environment:8081
+  #     AAS_REGISTRY_URL: http://aas-registry:8080
+  #     SUBMODEL_REGISTRY_URL: http://submodel-registry:8080
+  #     MQTT_BROKER_HOST: mosquitto
+  #     MQTT_BROKER_PORT: 1883
+  #     MINIO_ENDPOINT: minio:9000
+  #     MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-adaptivx}
+  #     MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-adaptivx123}
+  #   depends_on:
+  #     aas-environment:
+  #       condition: service_healthy
+  #     mosquitto:
+  #       condition: service_healthy
+  #     minio:
+  #       condition: service_healthy
+  #   networks:
+  #     - adaptivx-net
+
+  # skill-broker:
+  #   build:
+  #     context: ../../services/skill-broker
+  #     dockerfile: Dockerfile
+  #   container_name: adaptivx-skill-broker
+  #   ports:
+  #     - "8002:8000"
+  #   environment:
+  #     AAS_ENVIRONMENT_URL: http://aas-environment:8081
+  #     MQTT_BROKER_HOST: mosquitto
+  #     MQTT_BROKER_PORT: 1883
+  #   depends_on:
+  #     aas-environment:
+  #       condition: service_healthy
+  #     mosquitto:
+  #       condition: service_healthy
+  #   networks:
+  #     - adaptivx-net
+
+  # job-dispatcher:
+  #   build:
+  #     context: ../../services/job-dispatcher
+  #     dockerfile: Dockerfile
+  #   container_name: adaptivx-job-dispatcher
+  #   ports:
+  #     - "8003:8000"
+  #   environment:
+  #     AAS_REGISTRY_URL: http://aas-registry:8080
+  #     SUBMODEL_REGISTRY_URL: http://submodel-registry:8080
+  #     MQTT_BROKER_HOST: mosquitto
+  #     MQTT_BROKER_PORT: 1883
+  #   depends_on:
+  #     aas-environment:
+  #       condition: service_healthy
+  #   networks:
+  #     - adaptivx-net
+
+  # fault-injector:
+  #   build:
+  #     context: ../../services/fault-injector
+  #     dockerfile: Dockerfile
+  #   container_name: adaptivx-fault-injector
+  #   ports:
+  #     - "8004:8000"
+  #   environment:
+  #     MONITOR_URL: http://adaptivx-monitor:8000
+  #     BROKER_URL: http://adaptivx-skill-broker:8000
+  #   depends_on:
+  #     adaptiv-monitor:
+  #       condition: service_started
+  #     skill-broker:
+  #       condition: service_started
+  #   networks:
+  #     - adaptivx-net
+
+  # dashboard:
+  #   build:
+  #     context: ../../services/dashboard
+  #     dockerfile: Dockerfile
+  #   container_name: adaptivx-dashboard
+  #   ports:
+  #     - "3000:80"
+  #   environment:
+  #     VITE_AAS_ENVIRONMENT_URL: http://localhost:4001
+  #     VITE_MQTT_BROKER_URL: ws://localhost:9883
+  #   depends_on:
+  #     aas-environment:
+  #       condition: service_healthy
+  #   networks:
+  #     - adaptivx-net
+
+volumes:
+  aas-data:
+  mosquitto-data:
+  mosquitto-log:
+  minio-data:
+
+
+networks:
+  adaptivx-net:
+    driver: bridge

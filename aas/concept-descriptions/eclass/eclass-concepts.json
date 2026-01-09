@@ -1,0 +1,236 @@
+{
+    "conceptDescriptions": [
+        {
+            "modelType": "ConceptDescription",
+            "id": "0173-1#02-AAZ842#001",
+            "idShort": "HealthIndex",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Normalized health index value representing overall asset condition"
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Health Index"
+                            },
+                            {
+                                "language": "de",
+                                "text": "Gesundheitsindex"
+                            }
+                        ],
+                        "shortName": [
+                            {
+                                "language": "en",
+                                "text": "HealthIdx"
+                            }
+                        ],
+                        "unit": "",
+                        "dataType": "INTEGER_COUNT",
+                        "valueFormat": "NR1..3",
+                        "levelType": {
+                            "min": true,
+                            "max": true
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "0173-1#02-AAG920#004",
+            "idShort": "SurfaceRoughness",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Surface roughness Ra value in micrometers, corresponding to ECLASS property"
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Surface Roughness Ra"
+                            },
+                            {
+                                "language": "de",
+                                "text": "Oberflächenrauheit Ra"
+                            }
+                        ],
+                        "unit": "µm",
+                        "dataType": "REAL_MEASURE"
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "0173-1#02-AAE583#006",
+            "idShort": "ToleranceClass",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Dimensional tolerance class according to ISO 2768"
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Tolerance Class"
+                            },
+                            {
+                                "language": "de",
+                                "text": "Toleranzklasse"
+                            }
+                        ],
+                        "dataType": "STRING"
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "0173-1#02-AAT812#001",
+            "idShort": "EnergyConsumptionPerCycle",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Energy consumption per manufacturing cycle or part in kWh"
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Energy Consumption per Cycle"
+                            },
+                            {
+                                "language": "de",
+                                "text": "Energieverbrauch pro Zyklus"
+                            }
+                        ],
+                        "unit": "kWh",
+                        "dataType": "REAL_MEASURE"
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "0173-1#02-AAM632#002",
+            "idShort": "DateTime",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Date and time stamp in ISO 8601 format"
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Date Time"
+                            }
+                        ],
+                        "dataType": "DATE"
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "0173-1#01-AKJ975#017",
+            "idShort": "MillingProcess",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Milling manufacturing process as defined by ECLASS"
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Milling"
+                            },
+                            {
+                                "language": "de",
+                                "text": "Fräsen"
+                            }
+                        ],
+                        "dataType": "STRING"
+                    }
+                }
+            ]
+        }
+    ]
+}

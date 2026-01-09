@@ -1,0 +1,168 @@
+{
+    "modelType": "Submodel",
+    "kind": "Instance",
+    "semanticId": {
+        "type": "ExternalReference",
+        "keys": [
+            {
+                "type": "GlobalReference",
+                "value": "urn:adaptivx:submodel:health:1.0"
+            }
+        ]
+    },
+    "id": "urn:adaptivx:submodel:health:milling-01",
+    "idShort": "Health",
+    "description": [
+        {
+            "language": "en",
+            "text": "Health monitoring submodel for real-time asset condition assessment"
+        },
+        {
+            "language": "de",
+            "text": "Gesundheitsüberwachungs-Teilmodell für Echtzeit-Zustandsbewertung"
+        }
+    ],
+    "submodelElements": [
+        {
+            "modelType": "Property",
+            "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                    {
+                        "type": "GlobalReference",
+                        "value": "0173-1#02-AAZ842#001"
+                    }
+                ]
+            },
+            "idShort": "HealthIndex",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Overall health index (0-100), derived from ML and physics fusion"
+                }
+            ],
+            "valueType": "xs:int",
+            "value": "100"
+        },
+        {
+            "modelType": "Property",
+            "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                    {
+                        "type": "GlobalReference",
+                        "value": "urn:adaptivx:concept:healthconfidence:1.0"
+                    }
+                ]
+            },
+            "idShort": "HealthConfidence",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Confidence level of health assessment (0.0-1.0)"
+                }
+            ],
+            "valueType": "xs:double",
+            "value": "1.0"
+        },
+        {
+            "modelType": "Property",
+            "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                    {
+                        "type": "GlobalReference",
+                        "value": "urn:adaptivx:concept:anomalyscore:1.0"
+                    }
+                ]
+            },
+            "idShort": "AnomalyScore",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "ML-detected anomaly score (0.0=normal, 1.0=severe anomaly)"
+                }
+            ],
+            "valueType": "xs:double",
+            "value": "0.0"
+        },
+        {
+            "modelType": "Property",
+            "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                    {
+                        "type": "GlobalReference",
+                        "value": "urn:adaptivx:concept:physicsresidual:1.0"
+                    }
+                ]
+            },
+            "idShort": "PhysicsResidual",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Physics model residual (0.0=matches model, 1.0=severe deviation)"
+                }
+            ],
+            "valueType": "xs:double",
+            "value": "0.0"
+        },
+        {
+            "modelType": "Property",
+            "semanticId": {
+                "type": "ExternalReference",
+                "keys": [
+                    {
+                        "type": "GlobalReference",
+                        "value": "0173-1#02-AAM632#002"
+                    }
+                ]
+            },
+            "idShort": "LastUpdate",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Timestamp of last health assessment"
+                }
+            ],
+            "valueType": "xs:dateTime",
+            "value": "2025-01-01T00:00:00Z"
+        },
+        {
+            "modelType": "SubmodelElementCollection",
+            "idShort": "ExplainabilityBundle",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Explainability data for trustworthy AI compliance"
+                }
+            ],
+            "value": [
+                {
+                    "modelType": "Property",
+                    "idShort": "DecisionRationale",
+                    "description": [
+                        {
+                            "language": "en",
+                            "text": "Human-readable explanation of health assessment decision"
+                        }
+                    ],
+                    "valueType": "xs:string",
+                    "value": "Initial state: No anomalies detected, physics model confirms normal operation."
+                },
+                {
+                    "modelType": "Property",
+                    "idShort": "ModelVersion",
+                    "valueType": "xs:string",
+                    "value": "anomaly-detector-v1.0.0"
+                },
+                {
+                    "modelType": "Property",
+                    "idShort": "FMUVersion",
+                    "valueType": "xs:string",
+                    "value": "bearing_wear-fmi2.0"
+                }
+            ]
+        }
+    ]
+}

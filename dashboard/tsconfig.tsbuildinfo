@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/api/aas.ts","./src/components/dispatcherview.tsx","./src/components/faultinjector.tsx","./src/components/healthpanel.tsx","./src/components/skillcard.tsx","./src/hooks/usemqtt.ts","./src/store/assetsslice.ts","./src/store/index.ts","./src/store/jobsslice.ts"],"version":"5.9.3"}

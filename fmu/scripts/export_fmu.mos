@@ -1,0 +1,31 @@
+// export_fmu.mos - OpenModelica Script for FMU Export
+// 
+// Usage: omc export_fmu.mos
+// Output: BearingWear.fmu (FMI 2.0 Co-Simulation)
+//
+// Requirements: OpenModelica 1.18+ installed
+// 
+// Part of Adaptiv-X: Capability-Based Self-Healing Digital Twin
+
+// Load the Modelica model
+loadFile("BearingWear.mo");
+getErrorString();
+
+// Check for syntax errors
+checkModel(BearingWear);
+getErrorString();
+
+// Build FMU with FMI 2.0 Co-Simulation
+// Options:
+//   version="2.0" - FMI 2.0 standard
+//   fmuType="cs"  - Co-Simulation (includes solver)
+//   platforms={"static"} - Platform-independent
+buildModelFMU(
+  BearingWear, 
+  version="2.0", 
+  fmuType="cs"
+);
+getErrorString();
+
+// Verify FMU was created
+print("FMU export completed. Check for BearingWear.fmu file.");

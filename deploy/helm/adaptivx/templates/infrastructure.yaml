@@ -1,0 +1,140 @@
+{{- if .Values.mosquitto.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "adaptivx.fullname" . }}-mosquitto
+  labels:
+    {{- include "adaptivx.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mosquitto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "adaptivx.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: mosquitto
+  template:
+    metadata:
+      labels:
+        {{- include "adaptivx.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: mosquitto
+    spec:
+      containers:
+        - name: mosquitto
+          image: "{{ .Values.mosquitto.image.repository }}:{{ .Values.mosquitto.image.tag }}"
+          ports:
+            - name: mqtt
+              containerPort: 1883
+              protocol: TCP
+            - name: websocket
+              containerPort: 9001
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /mosquitto/config/mosquitto.conf
+              subPath: mosquitto.conf
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "adaptivx.fullname" . }}-mosquitto-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "adaptivx.fullname" . }}-mosquitto-config
+data:
+  mosquitto.conf: |
+    listener 1883
+    protocol mqtt
+    listener 9001
+    protocol websockets
+    allow_anonymous true
+    persistence false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "adaptivx.fullname" . }}-mosquitto
+  labels:
+    {{- include "adaptivx.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mosquitto
+spec:
+  type: {{ .Values.mosquitto.service.type }}
+  ports:
+    - port: {{ .Values.mosquitto.service.port }}
+      targetPort: mqtt
+      protocol: TCP
+      name: mqtt
+    - port: {{ .Values.mosquitto.service.websocketPort }}
+      targetPort: websocket
+      protocol: TCP
+      name: websocket
+  selector:
+    {{- include "adaptivx.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: mosquitto
+{{- end }}
+---
+{{- if .Values.minio.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "adaptivx.fullname" . }}-minio
+  labels:
+    {{- include "adaptivx.labels" . | nindent 4 }}
+    app.kubernetes.io/component: minio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "adaptivx.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: minio
+  template:
+    metadata:
+      labels:
+        {{- include "adaptivx.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: minio
+    spec:
+      containers:
+        - name: minio
+          image: "{{ .Values.minio.image.repository }}:{{ .Values.minio.image.tag }}"
+          args:
+            - server
+            - /data
+            - --console-address
+            - ":9001"
+          ports:
+            - name: api
+              containerPort: 9000
+              protocol: TCP
+            - name: console
+              containerPort: 9001
+              protocol: TCP
+          env:
+            - name: MINIO_ROOT_USER
+              value: {{ .Values.minio.rootUser | quote }}
+            - name: MINIO_ROOT_PASSWORD
+              value: {{ .Values.minio.rootPassword | quote }}
+            - name: MINIO_DEFAULT_BUCKETS
+              value: {{ .Values.minio.defaultBuckets | quote }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "adaptivx.fullname" . }}-minio
+  labels:
+    {{- include "adaptivx.labels" . | nindent 4 }}
+    app.kubernetes.io/component: minio
+spec:
+  type: {{ .Values.minio.service.type }}
+  ports:
+    - port: {{ .Values.minio.service.port }}
+      targetPort: api
+      protocol: TCP
+      name: api
+    - port: {{ .Values.minio.service.consolePort }}
+      targetPort: console
+      protocol: TCP
+      name: console
+  selector:
+    {{- include "adaptivx.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: minio
+{{- end }}
