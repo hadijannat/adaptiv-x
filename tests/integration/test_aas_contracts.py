@@ -7,6 +7,7 @@ defined in IDTA 02006 (Capability) and IDTA 02005 (Simulation).
 
 import os
 import pytest
+import pytest_asyncio
 import httpx
 from base64 import urlsafe_b64encode
 
@@ -16,8 +17,8 @@ def encode_id(identifier: str) -> str:
     """Base64-URL encode an identifier for AAS API paths."""
     return urlsafe_b64encode(identifier.encode()).decode().rstrip("=")
 
-@pytest.fixture
-async def client():
+@pytest_asyncio.fixture
+async def client() -> httpx.AsyncClient:
     async with httpx.AsyncClient(base_url=AAS_ENV_URL, timeout=10.0) as client:
         yield client
 
