@@ -45,9 +45,9 @@ class MQTTSubscriber:
 
         # Set callbacks
         client_any = cast(Any, self._client)
-        setattr(client_any, "on_connect", self._on_connect)
-        setattr(client_any, "on_disconnect", self._on_disconnect)
-        setattr(client_any, "on_message", self._on_message)
+        client_any.on_connect = self._on_connect
+        client_any.on_disconnect = self._on_disconnect
+        client_any.on_message = self._on_message
 
         try:
             self._client.connect_async(self.broker_host, self.broker_port)

@@ -346,7 +346,7 @@ def _evaluate_candidate(
 
 
 def _coerce_float(value: object, default: float) -> float:
-    if isinstance(value, (int, float)):
+    if isinstance(value, int | float):
         return float(value)
     if isinstance(value, str):
         try:
