@@ -5,12 +5,16 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:24.0.4
     container_name: adaptivx-keycloak
-    command: start-dev --http-port=8080 --hostname-strict=false
+    command: start-dev --http-port=8080 --hostname-strict=false --import-realm
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8088
     ports:
       - "8088:8080"
+    volumes:
+      - ../keycloak/realm-adaptivx.json:/opt/keycloak/data/import/realm-adaptivx.json:ro
     networks:
       - adaptivx-net
 
@@ -31,8 +35,9 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-adaptivx}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-adaptivx123}
       AUTH_ENABLED: "true"
-      OIDC_ISSUER: http://keycloak:8080/realms/adaptivx
+      OIDC_ISSUER: http://localhost:8088/realms/adaptivx
       OIDC_AUDIENCE: adaptivx-services
+      OIDC_JWKS_URL: http://keycloak:8080/realms/adaptivx/protocol/openid-connect/certs
     depends_on:
       aas-environment:
         condition: service_healthy
@@ -57,8 +62,9 @@ services:
       MQTT_BROKER_HOST: mosquitto
       MQTT_BROKER_PORT: 1883
       AUTH_ENABLED: "true"
-      OIDC_ISSUER: http://keycloak:8080/realms/adaptivx
+      OIDC_ISSUER: http://localhost:8088/realms/adaptivx
       OIDC_AUDIENCE: adaptivx-services
+      OIDC_JWKS_URL: http://keycloak:8080/realms/adaptivx/protocol/openid-connect/certs
     depends_on:
       aas-environment:
         condition: service_healthy
@@ -82,8 +88,9 @@ services:
       MQTT_BROKER_HOST: mosquitto
       MQTT_BROKER_PORT: 1883
       AUTH_ENABLED: "true"
-      OIDC_ISSUER: http://keycloak:8080/realms/adaptivx
+      OIDC_ISSUER: http://localhost:8088/realms/adaptivx
       OIDC_AUDIENCE: adaptivx-services
+      OIDC_JWKS_URL: http://keycloak:8080/realms/adaptivx/protocol/openid-connect/certs
     depends_on:
       aas-environment:
         condition: service_healthy
@@ -103,8 +110,9 @@ services:
       MONITOR_URL: http://adaptivx-monitor:8000
       BROKER_URL: http://adaptivx-skill-broker:8000
       AUTH_ENABLED: "true"
-      OIDC_ISSUER: http://keycloak:8080/realms/adaptivx
+      OIDC_ISSUER: http://localhost:8088/realms/adaptivx
       OIDC_AUDIENCE: adaptivx-services
+      OIDC_JWKS_URL: http://keycloak:8080/realms/adaptivx/protocol/openid-connect/certs
     depends_on:
       adaptiv-monitor:
         condition: service_started

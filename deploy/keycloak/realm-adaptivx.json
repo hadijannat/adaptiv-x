@@ -1,0 +1,43 @@
+{
+  "realm": "adaptivx",
+  "enabled": true,
+  "displayName": "Adaptiv-X",
+  "roles": {
+    "realm": [
+      {
+        "name": "demo-admin",
+        "description": "Privilege to trigger fault injection"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "adaptivx-services",
+      "name": "Adaptiv-X Services",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "adaptivx-secret",
+      "serviceAccountsEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "redirectUris": ["*"]
+    }
+  ],
+  "users": [
+    {
+      "username": "demo-admin",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "demo-admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["demo-admin"]
+    }
+  ]
+}

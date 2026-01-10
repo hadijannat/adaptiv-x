@@ -174,3 +174,79 @@ jobs:
         if: always()
         working-directory: deploy/compose
         run: docker compose down -v
+
+  # ============================================================================
+  # Security Smoke Test (OIDC)
+  # ============================================================================
+  security-smoke:
+    name: Security Smoke Test
+    runs-on: ubuntu-latest
+    needs: [docker-build]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Start secure stack
+        working-directory: deploy/compose
+        run: |
+          cp .env.example .env
+          export COMPOSE_PROJECT_NAME=adaptivx
+          docker compose -f docker-compose.yml -f docker-compose.secure.yml up -d \
+            keycloak mosquitto minio minio-init aas-registry submodel-registry aas-environment adaptiv-monitor
+          sleep 25
+
+      - name: Wait for Keycloak realm
+        run: |
+          for i in {1..30}; do
+            if curl -sf http://localhost:8088/realms/adaptivx > /dev/null; then
+              echo "Keycloak ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Keycloak not ready" >&2
+          exit 1
+
+      - name: Acquire token
+        id: token
+        run: |
+          TOKEN=$(curl -s -X POST http://localhost:8088/realms/adaptivx/protocol/openid-connect/token \
+            -d "client_id=adaptivx-services" \
+            -d "client_secret=adaptivx-secret" \
+            -d "grant_type=password" \
+            -d "username=demo-admin" \
+            -d "password=demo-admin" | jq -r .access_token)
+          if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+            echo "Failed to obtain token" >&2
+            exit 1
+          fi
+          echo "token=$TOKEN" >> $GITHUB_OUTPUT
+
+      - name: Verify auth enforcement
+        run: |
+          HEALTH_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8011/health)
+          if [ "$HEALTH_CODE" != "200" ]; then
+            echo "Expected /health 200, got $HEALTH_CODE" >&2
+            exit 1
+          fi
+          UNAUTH_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8011/debug/contract)
+          if [ "$UNAUTH_CODE" != "401" ]; then
+            echo "Expected /debug/contract 401, got $UNAUTH_CODE" >&2
+            exit 1
+          fi
+          AUTH_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ steps.token.outputs.token }}" \
+            http://localhost:8011/debug/contract)
+          if [ "$AUTH_CODE" != "200" ]; then
+            echo "Expected /debug/contract 200, got $AUTH_CODE" >&2
+            exit 1
+          fi
+
+      - name: Cleanup
+        if: always()
+        working-directory: deploy/compose
+        run: |
+          export COMPOSE_PROJECT_NAME=adaptivx
+          docker compose -f docker-compose.yml -f docker-compose.secure.yml down -v
