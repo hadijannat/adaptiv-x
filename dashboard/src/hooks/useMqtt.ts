@@ -3,7 +3,11 @@ import mqtt, { MqttClient } from 'mqtt';
 import { useDispatch } from 'react-redux';
 import { updateHealth } from '../store/assetsSlice';
 
-const MQTT_BROKER = import.meta.env.VITE_MQTT_BROKER_URL ?? 'ws://localhost:9883';
+const ENV_BROKER = import.meta.env.VITE_MQTT_BROKER_URL;
+if (import.meta.env.PROD && !ENV_BROKER) {
+    throw new Error('VITE_MQTT_BROKER_URL must be set for production builds');
+}
+const MQTT_BROKER = ENV_BROKER ?? 'ws://localhost:9883';
 
 export function useMqtt() {
     const clientRef = useRef<MqttClient | null>(null);

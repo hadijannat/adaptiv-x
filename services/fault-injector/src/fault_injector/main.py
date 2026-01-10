@@ -19,7 +19,8 @@ from aas_contract import (
 from aas_contract import (
     __version__ as contract_version,
 )
-from fastapi import FastAPI, HTTPException, Request
+from adaptiv_auth import AuthSettings, AuthVerifier, auth_middleware, require_role
+from fastapi import Depends, FastAPI, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from fault_injector.clients import BrokerClient, MonitorClient
@@ -29,6 +30,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 settings = Settings()
+auth_settings = AuthSettings(
+    enabled=settings.auth_enabled,
+    issuer=settings.oidc_issuer,
+    audience=settings.oidc_audience,
+    jwks_url=settings.oidc_jwks_url,
+    cache_ttl_seconds=settings.auth_cache_ttl_seconds,
+)
+auth_verifier = AuthVerifier(auth_settings)
 
 
 class FaultInjectionRequest(BaseModel):
@@ -81,6 +90,11 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+app.state.auth_enabled = settings.auth_enabled
+app.state.auth_verifier = auth_verifier
+app.middleware("http")(auth_middleware(auth_verifier))
+
+DEMO_ADMIN_DEP = Depends(require_role("demo-admin"))
 
 
 @app.get("/health")
@@ -102,7 +116,9 @@ async def debug_contract() -> dict[str, object]:
 
 @app.post("/inject", response_model=FaultInjectionResponse)
 async def inject_fault(
-    request: FaultInjectionRequest, http_request: Request
+    request: FaultInjectionRequest,
+    http_request: Request,
+    _claims: dict[str, object] = DEMO_ADMIN_DEP,
 ) -> FaultInjectionResponse:
     monitor_client: MonitorClient = http_request.app.state.monitor_client
     broker_client: BrokerClient = http_request.app.state.broker_client

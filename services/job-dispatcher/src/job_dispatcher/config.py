@@ -22,4 +22,11 @@ class Settings(BaseSettings):
     enable_bidding_mode: bool = True
     bid_timeout_seconds: float = 5.0
 
+    # Auth (OIDC)
+    auth_enabled: bool = False
+    oidc_issuer: str | None = None
+    oidc_audience: str | None = None
+    oidc_jwks_url: str | None = None
+    auth_cache_ttl_seconds: int = 300
+
     model_config = {"env_prefix": "", "case_sensitive": False}

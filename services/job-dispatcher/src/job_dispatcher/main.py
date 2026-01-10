@@ -29,6 +29,7 @@ from aas_contract import (
 from aas_contract import (
     __version__ as contract_version,
 )
+from adaptiv_auth import AuthSettings, AuthVerifier, auth_middleware
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel, Field
 
@@ -44,6 +45,14 @@ logger = logging.getLogger(__name__)
 
 # Global instances
 settings = Settings()
+auth_settings = AuthSettings(
+    enabled=settings.auth_enabled,
+    issuer=settings.oidc_issuer,
+    audience=settings.oidc_audience,
+    jwks_url=settings.oidc_jwks_url,
+    cache_ttl_seconds=settings.auth_cache_ttl_seconds,
+)
+auth_verifier = AuthVerifier(auth_settings)
 
 
 # ============================================================================
@@ -158,6 +167,9 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+app.state.auth_enabled = settings.auth_enabled
+app.state.auth_verifier = auth_verifier
+app.middleware("http")(auth_middleware(auth_verifier))
 
 
 # ============================================================================

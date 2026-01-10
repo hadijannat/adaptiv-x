@@ -17,4 +17,11 @@ class Settings(BaseSettings):
     monitor_url: str = "http://localhost:8011"
     broker_url: str = "http://localhost:8002"
 
+    # Auth (OIDC)
+    auth_enabled: bool = False
+    oidc_issuer: str | None = None
+    oidc_audience: str | None = None
+    oidc_jwks_url: str | None = None
+    auth_cache_ttl_seconds: int = 300
+
     model_config = {"env_prefix": "", "case_sensitive": False}

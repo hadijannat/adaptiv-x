@@ -16,6 +16,7 @@ pydantic-settings = "^2.1.0"
 httpx = "^0.26.0"
 paho-mqtt = "^2.0.0"
 aas-contract = {path = "../../libs/aas_contract", develop = true}
+adaptiv-auth = {path = "../../libs/auth", develop = true}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
@@ -40,7 +41,7 @@ ignore = ["S101"]
 python_version = "3.11"
 strict = true
 plugins = ["pydantic.mypy"]
-mypy_path = ["../../libs/aas_contract/src"]
+mypy_path = ["../../libs/aas_contract/src", "../../libs/auth/src"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
