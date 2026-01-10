@@ -54,10 +54,18 @@ async def test_capability_submodel_contract(client):
     # Check for critical elements used by Job-Dispatcher
     elements = sm.get("submodelElements", [])
     id_shorts = [e.get("idShort") for e in elements]
-    
+
     # ProcessCapability:Milling is a submodel element collection
     assert any("Milling" in s for s in id_shorts)
-    assert "CarbonFootprintGPerPart" in id_shorts
+
+    process_capability = next(
+        (e for e in elements if e.get("idShort") == "ProcessCapability:Milling"),
+        None,
+    )
+    assert process_capability is not None
+    process_values = process_capability.get("value", [])
+    process_ids = {e.get("idShort") for e in process_values}
+    assert "CarbonFootprintGPerPart" in process_ids
 
 @pytest.mark.asyncio
 async def test_health_submodel_contract(client):
