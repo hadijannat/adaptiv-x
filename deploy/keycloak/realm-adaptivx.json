@@ -18,11 +18,23 @@
       "protocol": "openid-connect",
       "publicClient": false,
       "secret": "adaptivx-secret",
-      "serviceAccountsEnabled": false,
+      "serviceAccountsEnabled": true,
       "directAccessGrantsEnabled": true,
       "standardFlowEnabled": false,
       "implicitFlowEnabled": false,
-      "redirectUris": ["*"]
+      "redirectUris": ["*"],
+      "protocolMappers": [
+        {
+          "name": "audience-adaptivx-services",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "adaptivx-services",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ]
     }
   ],
   "users": [

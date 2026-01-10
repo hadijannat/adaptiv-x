@@ -215,9 +215,7 @@ jobs:
           TOKEN=$(curl -s -X POST http://localhost:8088/realms/adaptivx/protocol/openid-connect/token \
             -d "client_id=adaptivx-services" \
             -d "client_secret=adaptivx-secret" \
-            -d "grant_type=password" \
-            -d "username=demo-admin" \
-            -d "password=demo-admin" | jq -r .access_token)
+            -d "grant_type=client_credentials" | jq -r .access_token)
           if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
             echo "Failed to obtain token" >&2
             exit 1
