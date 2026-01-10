@@ -11,6 +11,12 @@ class HealthPayload(BaseModel):
     anomaly_score: float = Field(..., ge=0, le=1)
     physics_residual: float = Field(..., ge=0, le=1)
     decision_rationale: str | None = None
+    detected_pattern: str | None = None
+    fusion_method: str | None = None
+    confidence_interval: str | None = None
+    fmu_residual: float | None = None
+    model_version: str | None = None
+    fmu_version: str | None = None
 
 
 class CapabilityPayload(BaseModel):
@@ -18,6 +24,7 @@ class CapabilityPayload(BaseModel):
     surface_finish_grade: str | None = None
     tolerance_class: str | None = None
     energy_cost_per_part_kwh: float | None = None
+    carbon_footprint_g_per_part: float | None = None
 
 
 class SimulationModelReference(BaseModel):

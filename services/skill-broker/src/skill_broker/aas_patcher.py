@@ -167,3 +167,26 @@ class AASPatcher:
         except Exception as e:
             logger.error("Failed to list assets: %s", e)
             return []
+
+    async def get_capability_state(self, asset_id: str) -> dict[str, str]:
+        """Retrieve capability state for an asset."""
+        submodel_id = capability_submodel_id(asset_id)
+        encoded_sm_id = encode_id(submodel_id)
+        try:
+            response = await self._client.get(
+                f"{self.aas_env_url}/submodels/{encoded_sm_id}",
+                headers={"Accept": "application/json"},
+            )
+            response.raise_for_status()
+            submodel = response.json()
+            result: dict[str, str] = {}
+            for element in submodel.get("submodelElements", []):
+                if element.get("idShort", "").startswith("ProcessCapability:"):
+                    for prop in element.get("value", []):
+                        id_short = prop.get("idShort", "")
+                        if "value" in prop:
+                            result[id_short] = str(prop.get("value"))
+            return result
+        except Exception as e:
+            logger.error("Failed to get capability state for %s: %s", asset_id, e)
+            return {}

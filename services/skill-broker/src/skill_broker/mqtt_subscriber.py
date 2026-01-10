@@ -92,6 +92,32 @@ class MQTTSubscriber:
             self._connected = False
             self._client = None
 
+    async def publish_capability_event(
+        self,
+        asset_id: str,
+        capability: dict[str, str],
+        changes: list[dict[str, str]] | None = None,
+    ) -> None:
+        """Publish capability update event for downstream consumers."""
+        await self.ensure_connected()
+        if not self._connected or not self._client:
+            logger.debug("MQTT not connected, skipping capability publish")
+            return
+
+        payload = json.dumps(
+            {
+                "asset_id": asset_id,
+                "timestamp": datetime.now(UTC).isoformat(),
+                "capability": capability,
+                "changes": changes or [],
+            }
+        )
+        topic = f"adaptivx/capability/{asset_id}"
+        try:
+            self._client.publish(topic, payload, qos=1)
+        except Exception as e:
+            logger.error("Failed to publish capability event: %s", e)
+
     def _on_connect(
         self,
         client: mqtt.Client,

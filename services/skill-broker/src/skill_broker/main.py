@@ -191,6 +191,18 @@ async def _evaluate_and_apply(
         except Exception as e:
             logger.error(f"Failed to apply action {action}: {e}")
 
+    # Publish capability update event
+    try:
+        mqtt_subscriber: MQTTSubscriber = app.state.mqtt_subscriber
+        capability_state = await aas_patcher.get_capability_state(asset_id)
+        await mqtt_subscriber.publish_capability_event(
+            asset_id,
+            capability_state,
+            changes=[{"path": a.path, "value": a.value} for a in actions],
+        )
+    except Exception as exc:
+        logger.debug("Capability publish skipped: %s", exc)
+
     return actions
 
 

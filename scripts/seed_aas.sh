@@ -74,6 +74,25 @@ upload_aas_package() {
             }
         done
     fi
+
+    # Upload concept descriptions (if present)
+    local concept_desc=$(echo "$content" | jq -c '.conceptDescriptions[]' 2>/dev/null || echo "")
+    if [ -n "$concept_desc" ]; then
+        echo "$concept_desc" | while read -r cd; do
+            local cd_id=$(echo "$cd" | jq -r '.id')
+            log_info "  Creating ConceptDescription: $cd_id"
+
+            curl -sf -X POST "$AAS_ENV_URL/concept-descriptions" \
+                -H "Content-Type: application/json" \
+                -d "$cd" > /dev/null 2>&1 || {
+                log_warn "  ConceptDescription $cd_id may already exist, trying update..."
+                local encoded_id=$(echo -n "$cd_id" | base64 | tr '+/' '-_' | tr -d '=')
+                curl -sf -X PUT "$AAS_ENV_URL/concept-descriptions/$encoded_id" \
+                    -H "Content-Type: application/json" \
+                    -d "$cd" > /dev/null 2>&1 || true
+            }
+        done
+    fi
 }
 
 upload_aasx_package() {
@@ -139,6 +158,29 @@ main() {
             fi
         done
     fi
+
+    # Upload concept descriptions from curated files
+    for concept_file in "$PROJECT_ROOT/aas/concept-descriptions"/*/*.json; do
+        if [ -f "$concept_file" ]; then
+            log_info "Uploading concept descriptions from $(basename "$concept_file")..."
+            local concepts=$(jq -c '.conceptDescriptions[]' "$concept_file" 2>/dev/null || echo "")
+            if [ -n "$concepts" ]; then
+                echo "$concepts" | while read -r cd; do
+                    local cd_id=$(echo "$cd" | jq -r '.id')
+                    log_info "  Creating ConceptDescription: $cd_id"
+                    curl -sf -X POST "$AAS_ENV_URL/concept-descriptions" \
+                        -H "Content-Type: application/json" \
+                        -d "$cd" > /dev/null 2>&1 || {
+                        log_warn "  ConceptDescription $cd_id may already exist, trying update..."
+                        local encoded_id=$(echo -n "$cd_id" | base64 | tr '+/' '-_' | tr -d '=')
+                        curl -sf -X PUT "$AAS_ENV_URL/concept-descriptions/$encoded_id" \
+                            -H "Content-Type: application/json" \
+                            -d "$cd" > /dev/null 2>&1 || true
+                    }
+                done
+            fi
+        fi
+    done
     
     # Upload FMU
     upload_fmu

@@ -69,6 +69,12 @@ class HealthAssessment(BaseModel):
     anomaly_score: float = Field(..., ge=0, le=1)
     physics_residual: float = Field(..., ge=0, le=1)
     decision_rationale: str
+    detected_pattern: str | None = None
+    fusion_method: str | None = None
+    confidence_interval: str | None = None
+    fmu_residual: float | None = None
+    model_version: str | None = None
+    fmu_version: str | None = None
     timestamp: datetime
 
 
@@ -206,8 +212,11 @@ async def assess_health(data: VibrationData, request: Request) -> HealthAssessme
     # Step 4: Health Fusion
     result: HealthResult = health_fusion.compute(anomaly_score, physics_residual)
 
-    # Generate decision rationale
+    # Generate explainability details
+    detected_pattern = _detected_pattern(anomaly_score)
     rationale = _generate_rationale(anomaly_score, physics_residual, result)
+    fusion_method = f"weighted_v1(ml={settings.ml_weight}, physics={settings.physics_weight})"
+    confidence_interval = _confidence_interval(result.health_confidence)
 
     # Step 5: Update AAS Health Submodel
     try:
@@ -218,6 +227,12 @@ async def assess_health(data: VibrationData, request: Request) -> HealthAssessme
             anomaly_score=anomaly_score,
             physics_residual=physics_residual,
             rationale=rationale,
+            detected_pattern=detected_pattern,
+            fusion_method=fusion_method,
+            confidence_interval=confidence_interval,
+            fmu_residual=physics_residual,
+            model_version=settings.ml_model_version,
+            fmu_version=settings.fmu_model_version,
         )
         logger.info(f"Updated Health submodel for {data.asset_id}")
     except Exception as e:
@@ -239,6 +254,12 @@ async def assess_health(data: VibrationData, request: Request) -> HealthAssessme
         anomaly_score=anomaly_score,
         physics_residual=physics_residual,
         decision_rationale=rationale,
+        detected_pattern=detected_pattern,
+        fusion_method=fusion_method,
+        confidence_interval=confidence_interval,
+        fmu_residual=physics_residual,
+        model_version=settings.ml_model_version,
+        fmu_version=settings.fmu_model_version,
         timestamp=datetime.now(UTC),
     )
 
@@ -278,6 +299,12 @@ async def get_current_health(asset_id: str, request: Request) -> HealthAssessmen
                 HEALTH_ELEMENT_PATHS["physics_residual"], 0.0
             ),
             decision_rationale=health_data.get("DecisionRationale", ""),
+            detected_pattern=health_data.get("DetectedPattern"),
+            fusion_method=health_data.get("FusionMethod"),
+            confidence_interval=health_data.get("ConfidenceInterval"),
+            fmu_residual=health_data.get("FMUResidual"),
+            model_version=health_data.get("ModelVersion"),
+            fmu_version=health_data.get("FMUVersion"),
             timestamp=datetime.now(UTC),
         )
     except Exception as e:
@@ -330,6 +357,21 @@ def _generate_rationale(
         parts.append("Asset requires attention - capability may be compromised")
 
     return ". ".join(parts) + "."
+
+
+def _detected_pattern(anomaly_score: float) -> str:
+    """Derive a categorical pattern label from the anomaly score."""
+    if anomaly_score < 0.2:
+        return "normal"
+    if anomaly_score < 0.5:
+        return "minor_anomaly"
+    return "major_anomaly"
+
+
+def _confidence_interval(confidence: float) -> str:
+    """Create a simple confidence interval string from confidence value."""
+    margin = max(0.0, min(100.0, (1.0 - confidence) * 100.0))
+    return f"±{margin:.1f}%"
 
 
 def run() -> None:

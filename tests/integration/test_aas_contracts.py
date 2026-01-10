@@ -57,6 +57,7 @@ async def test_capability_submodel_contract(client):
     
     # ProcessCapability:Milling is a submodel element collection
     assert any("Milling" in s for s in id_shorts)
+    assert "CarbonFootprintGPerPart" in id_shorts
 
 @pytest.mark.asyncio
 async def test_health_submodel_contract(client):
@@ -76,6 +77,18 @@ async def test_health_submodel_contract(client):
     assert "HealthConfidence" in id_shorts
     assert "AnomalyScore" in id_shorts
     assert "PhysicsResidual" in id_shorts
+
+    bundle = next(
+        (e for e in elements if e.get("idShort") == "ExplainabilityBundle"),
+        None,
+    )
+    assert bundle is not None
+    bundle_ids = {e.get("idShort") for e in bundle.get("value", [])}
+    assert "DecisionRationale" in bundle_ids
+    assert "DetectedPattern" in bundle_ids
+    assert "FusionMethod" in bundle_ids
+    assert "ConfidenceInterval" in bundle_ids
+    assert "FMUResidual" in bundle_ids
 
 @pytest.mark.asyncio
 async def test_semantic_id_consistency(client):

@@ -38,6 +38,8 @@ class Settings(BaseSettings):
     anomaly_zscore_threshold: float = 3.0
     anomaly_threshold_vib_rms: float = 3.0
     anomaly_threshold_factor: float = 2.0
+    ml_model_version: str = "anomaly-detector-v1.0.0"
+    fmu_model_version: str = "bearing_wear-fmi2.0"
 
     # Health fusion weights
     ml_weight: float = 0.6

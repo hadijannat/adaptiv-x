@@ -33,8 +33,10 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from job_dispatcher.bidding import Bid, BiddingService, Contract
+from job_dispatcher.capability_cache import CapabilityCache
 from job_dispatcher.capability_query import CapabilityQueryService
 from job_dispatcher.config import Settings
+from job_dispatcher.mqtt_subscriber import CapabilityMQTTSubscriber
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -128,9 +130,18 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     )
 
     bidding_service = BiddingService(query_service)
+    capability_cache = CapabilityCache(ttl_seconds=settings.capability_cache_ttl_seconds)
+    mqtt_subscriber = CapabilityMQTTSubscriber(
+        broker_host=settings.mqtt_broker_host,
+        broker_port=settings.mqtt_broker_port,
+        on_capability_event=lambda payload: _handle_capability_event(capability_cache, payload),
+    )
+    await mqtt_subscriber.connect()
 
     app.state.query_service = query_service
     app.state.bidding_service = bidding_service
+    app.state.capability_cache = capability_cache
+    app.state.mqtt_subscriber = mqtt_subscriber
 
     logger.info("Job-Dispatcher service started successfully")
 
@@ -138,6 +149,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     logger.info("Shutting down Job-Dispatcher service...")
     await query_service.close()
+    await mqtt_subscriber.disconnect()
 
 
 app = FastAPI(
@@ -187,6 +199,9 @@ async def dispatch_job(request: JobRequest, http_request: Request) -> JobAssignm
     # Get all candidates with their capability state
     query_service: CapabilityQueryService = http_request.app.state.query_service
     candidates = await query_service.get_all_candidates()
+    cache: CapabilityCache = http_request.app.state.capability_cache
+    for asset_id, capability in cache.snapshot().items():
+        candidates[asset_id] = capability
 
     # Evaluate each candidate against requirements
     evaluated: list[AssetCandidate] = []
@@ -282,6 +297,9 @@ async def list_candidates(http_request: Request) -> list[AssetCandidate]:
     """List all available asset candidates with their capability states."""
     query_service: CapabilityQueryService = http_request.app.state.query_service
     candidates = await query_service.get_all_candidates()
+    cache: CapabilityCache = http_request.app.state.capability_cache
+    for asset_id, capability in cache.snapshot().items():
+        candidates[asset_id] = capability
 
     # Default requirements for display
     requirements = CapabilityRequirement()
@@ -301,6 +319,11 @@ async def get_job_history(limit: int = 20) -> list[JobAssignment]:
 # ============================================================================
 # Helper Functions
 # ============================================================================
+
+
+async def _handle_capability_event(cache: CapabilityCache, payload: dict[str, object]) -> None:
+    """Update capability cache from MQTT events."""
+    cache.update_from_event(payload)
 
 
 def _evaluate_candidate(

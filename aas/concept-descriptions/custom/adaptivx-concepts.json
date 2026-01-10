@@ -11,7 +11,7 @@
                 },
                 {
                     "language": "de",
-                    "text": "Fähigkeitszusicherungsstatus nach deutschem Capability-Based Engineering"
+                    "text": "F\u00e4higkeitszusicherungsstatus nach deutschem Capability-Based Engineering"
                 }
             ],
             "embeddedDataSpecifications": [
@@ -204,6 +204,478 @@
                             }
                         ],
                         "dataType": "REAL_MEASURE"
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "urn:adaptivx:concept:surfacefinishgrade:1.0",
+            "idShort": "SurfaceFinishGrade",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Surface finish grade classification used for capability routing (A/B/C)."
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Surface Finish Grade"
+                            }
+                        ],
+                        "definition": [
+                            {
+                                "language": "en",
+                                "text": "Surface finish grade classification used for capability routing (A/B/C)."
+                            }
+                        ],
+                        "dataType": "STRING",
+                        "valueList": {
+                            "valueReferencePairs": [
+                                {
+                                    "value": "A",
+                                    "valueId": {
+                                        "type": "ExternalReference",
+                                        "keys": [
+                                            {
+                                                "type": "GlobalReference",
+                                                "value": "urn:adaptivx:value:surfacefinishgrade:A"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "value": "B",
+                                    "valueId": {
+                                        "type": "ExternalReference",
+                                        "keys": [
+                                            {
+                                                "type": "GlobalReference",
+                                                "value": "urn:adaptivx:value:surfacefinishgrade:B"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "value": "C",
+                                    "valueId": {
+                                        "type": "ExternalReference",
+                                        "keys": [
+                                            {
+                                                "type": "GlobalReference",
+                                                "value": "urn:adaptivx:value:surfacefinishgrade:C"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "urn:adaptivx:concept:maxspindlespeed:1.0",
+            "idShort": "MaxSpindleSpeed_rpm",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Maximum spindle speed of the asset in revolutions per minute."
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Max Spindle Speed"
+                            }
+                        ],
+                        "definition": [
+                            {
+                                "language": "en",
+                                "text": "Maximum spindle speed of the asset in revolutions per minute."
+                            }
+                        ],
+                        "dataType": "INTEGER_COUNT",
+                        "unit": "rpm"
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "urn:adaptivx:concept:maxfeedrate:1.0",
+            "idShort": "MaxFeedRate_mmPerMin",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Maximum feed rate in millimeters per minute."
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Max Feed Rate"
+                            }
+                        ],
+                        "definition": [
+                            {
+                                "language": "en",
+                                "text": "Maximum feed rate in millimeters per minute."
+                            }
+                        ],
+                        "dataType": "REAL_MEASURE",
+                        "unit": "mm/min"
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "urn:adaptivx:concept:carbonfootprint:1.0",
+            "idShort": "CarbonFootprintGPerPart",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Estimated carbon footprint per manufactured part."
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Carbon Footprint per Part"
+                            }
+                        ],
+                        "definition": [
+                            {
+                                "language": "en",
+                                "text": "Estimated carbon footprint per manufactured part."
+                            }
+                        ],
+                        "dataType": "REAL_MEASURE",
+                        "unit": "g"
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "urn:adaptivx:concept:decisionrationale:1.0",
+            "idShort": "DecisionRationale",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Human-readable explanation of the health assessment decision."
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Decision Rationale"
+                            }
+                        ],
+                        "definition": [
+                            {
+                                "language": "en",
+                                "text": "Human-readable explanation of the health assessment decision."
+                            }
+                        ],
+                        "dataType": "STRING"
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "urn:adaptivx:concept:detectedpattern:1.0",
+            "idShort": "DetectedPattern",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Categorical label from ML anomaly detection (normal/minor/major)."
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Detected Pattern"
+                            }
+                        ],
+                        "definition": [
+                            {
+                                "language": "en",
+                                "text": "Categorical label from ML anomaly detection (normal/minor/major)."
+                            }
+                        ],
+                        "dataType": "STRING"
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "urn:adaptivx:concept:fusionmethod:1.0",
+            "idShort": "FusionMethod",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Method used to fuse ML and physics signals."
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Fusion Method"
+                            }
+                        ],
+                        "definition": [
+                            {
+                                "language": "en",
+                                "text": "Method used to fuse ML and physics signals."
+                            }
+                        ],
+                        "dataType": "STRING"
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "urn:adaptivx:concept:confidenceinterval:1.0",
+            "idShort": "ConfidenceInterval",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Confidence interval representation for the health assessment."
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Confidence Interval"
+                            }
+                        ],
+                        "definition": [
+                            {
+                                "language": "en",
+                                "text": "Confidence interval representation for the health assessment."
+                            }
+                        ],
+                        "dataType": "STRING"
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "urn:adaptivx:concept:fmuresidual:1.0",
+            "idShort": "FMUResidual",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Residual derived from FMU physics simulation for explainability."
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "FMU Residual"
+                            }
+                        ],
+                        "definition": [
+                            {
+                                "language": "en",
+                                "text": "Residual derived from FMU physics simulation for explainability."
+                            }
+                        ],
+                        "dataType": "REAL_MEASURE"
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "urn:adaptivx:concept:modelversion:1.0",
+            "idShort": "ModelVersion",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Version identifier for the anomaly detection model."
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "Model Version"
+                            }
+                        ],
+                        "definition": [
+                            {
+                                "language": "en",
+                                "text": "Version identifier for the anomaly detection model."
+                            }
+                        ],
+                        "dataType": "STRING"
+                    }
+                }
+            ]
+        },
+        {
+            "modelType": "ConceptDescription",
+            "id": "urn:adaptivx:concept:fmuversion:1.0",
+            "idShort": "FMUVersion",
+            "description": [
+                {
+                    "language": "en",
+                    "text": "Version identifier for the FMU used for validation."
+                }
+            ],
+            "embeddedDataSpecifications": [
+                {
+                    "dataSpecification": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0"
+                            }
+                        ]
+                    },
+                    "dataSpecificationContent": {
+                        "preferredName": [
+                            {
+                                "language": "en",
+                                "text": "FMU Version"
+                            }
+                        ],
+                        "definition": [
+                            {
+                                "language": "en",
+                                "text": "Version identifier for the FMU used for validation."
+                            }
+                        ],
+                        "dataType": "STRING"
                     }
                 }
             ]

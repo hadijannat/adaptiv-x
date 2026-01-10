@@ -71,8 +71,11 @@ class BasyxClient:
                     result[id_short] = element["value"]
                 elif element.get("modelType") == "SubmodelElementCollection":
                     for sub_elem in element.get("value", []):
-                        if sub_elem.get("idShort") == "DecisionRationale":
-                            result["DecisionRationale"] = sub_elem.get("value", "")
+                        sub_id = sub_elem.get("idShort")
+                        if not sub_id:
+                            continue
+                        if "value" in sub_elem:
+                            result[sub_id] = sub_elem.get("value", "")
 
             return result
         except httpx.HTTPStatusError as e:
@@ -91,6 +94,12 @@ class BasyxClient:
         anomaly_score: float,
         physics_residual: float,
         rationale: str,
+        detected_pattern: str | None = None,
+        fusion_method: str | None = None,
+        confidence_interval: str | None = None,
+        fmu_residual: float | None = None,
+        model_version: str | None = None,
+        fmu_version: str | None = None,
     ) -> None:
         """Update health submodel values for an asset."""
         submodel_id = health_submodel_id(asset_id)
@@ -108,12 +117,22 @@ class BasyxClient:
         for id_short, value in updates:
             await self._patch_property(encoded_sm_id, id_short, value)
 
-        # Update rationale in nested collection
-        await self._patch_property(
-            encoded_sm_id,
-            HEALTH_ELEMENT_PATHS["decision_rationale"],
-            rationale,
-        )
+        # Update explainability bundle
+        fmu_residual_value = None if fmu_residual is None else str(fmu_residual)
+        explainability_updates: dict[str, str | None] = {
+            HEALTH_ELEMENT_PATHS["decision_rationale"]: rationale,
+            HEALTH_ELEMENT_PATHS["detected_pattern"]: detected_pattern,
+            HEALTH_ELEMENT_PATHS["fusion_method"]: fusion_method,
+            HEALTH_ELEMENT_PATHS["confidence_interval"]: confidence_interval,
+            HEALTH_ELEMENT_PATHS["fmu_residual"]: fmu_residual_value,
+            HEALTH_ELEMENT_PATHS["model_version"]: model_version,
+            HEALTH_ELEMENT_PATHS["fmu_version"]: fmu_version,
+        }
+
+        for id_short, explain_value in explainability_updates.items():
+            if explain_value is None:
+                continue
+            await self._patch_property(encoded_sm_id, id_short, str(explain_value))
 
     async def _patch_property(
         self, encoded_sm_id: str, id_short_path: str, value: str

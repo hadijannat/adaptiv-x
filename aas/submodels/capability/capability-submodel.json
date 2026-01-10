@@ -19,7 +19,7 @@
         },
         {
             "language": "de",
-            "text": "Fähigkeitsbeschreibungs-Teilmodell nach deutschem Capability-Based Engineering"
+            "text": "F\u00e4higkeitsbeschreibungs-Teilmodell nach deutschem Capability-Based Engineering"
         }
     ],
     "submodelElements": [
@@ -49,7 +49,7 @@
                         "keys": [
                             {
                                 "type": "GlobalReference",
-                                "value": "0173-1#02-AAG920#004"
+                                "value": "urn:adaptivx:concept:surfacefinishgrade:1.0"
                             }
                         ]
                     },
@@ -82,7 +82,7 @@
                         }
                     ],
                     "valueType": "xs:string",
-                    "value": "±0.02mm"
+                    "value": "\u00b10.02mm"
                 },
                 {
                     "modelType": "Property",
@@ -103,7 +103,7 @@
                         },
                         {
                             "language": "de",
-                            "text": "Fähigkeitszusicherungsstatus: zugesichert, angeboten, oder nicht verfügbar"
+                            "text": "F\u00e4higkeitszusicherungsstatus: zugesichert, angeboten, oder nicht verf\u00fcgbar"
                         }
                     ],
                     "valueType": "xs:string",
@@ -132,6 +132,27 @@
                 },
                 {
                     "modelType": "Property",
+                    "idShort": "CarbonFootprintGPerPart",
+                    "description": [
+                        {
+                            "language": "en",
+                            "text": "Estimated carbon footprint per part"
+                        }
+                    ],
+                    "valueType": "xs:double",
+                    "value": "120.0",
+                    "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "urn:adaptivx:concept:carbonfootprint:1.0"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "modelType": "Property",
                     "idShort": "MaxSpindleSpeed_rpm",
                     "description": [
                         {
@@ -140,7 +161,16 @@
                         }
                     ],
                     "valueType": "xs:int",
-                    "value": "24000"
+                    "value": "24000",
+                    "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "urn:adaptivx:concept:maxspindlespeed:1.0"
+                            }
+                        ]
+                    }
                 },
                 {
                     "modelType": "Property",
@@ -152,7 +182,16 @@
                         }
                     ],
                     "valueType": "xs:int",
-                    "value": "15000"
+                    "value": "15000",
+                    "semanticId": {
+                        "type": "ExternalReference",
+                        "keys": [
+                            {
+                                "type": "GlobalReference",
+                                "value": "urn:adaptivx:concept:maxfeedrate:1.0"
+                            }
+                        ]
+                    }
                 },
                 {
                     "modelType": "SubmodelElementCollection",
@@ -214,5 +253,9 @@
                 }
             ]
         }
-    ]
+    ],
+    "administration": {
+        "version": "1.1",
+        "revision": "0"
+    }
 }

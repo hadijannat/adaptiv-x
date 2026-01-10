@@ -16,6 +16,7 @@ class Settings(BaseSettings):
 
     mqtt_broker_host: str = "localhost"
     mqtt_broker_port: int = 1883
+    capability_cache_ttl_seconds: float = 300.0
 
     # VDI/VDE 2193 bidding mode
     enable_bidding_mode: bool = True

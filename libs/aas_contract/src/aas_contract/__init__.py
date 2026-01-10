@@ -24,7 +24,7 @@ from .paths import (
     simulation_submodel_id,
 )
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "CAPABILITY_ELEMENT_PATHS",

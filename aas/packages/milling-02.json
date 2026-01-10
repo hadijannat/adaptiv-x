@@ -110,23 +110,114 @@
                             "modelType": "Property",
                             "idShort": "DecisionRationale",
                             "valueType": "xs:string",
-                            "value": "Initial state: No anomalies detected."
+                            "value": "Initial state: No anomalies detected.",
+                            "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                    {
+                                        "type": "GlobalReference",
+                                        "value": "urn:adaptivx:concept:decisionrationale:1.0"
+                                    }
+                                ]
+                            }
                         },
                         {
                             "modelType": "Property",
                             "idShort": "ModelVersion",
                             "valueType": "xs:string",
-                            "value": "anomaly-detector-v1.0.0"
+                            "value": "anomaly-detector-v1.0.0",
+                            "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                    {
+                                        "type": "GlobalReference",
+                                        "value": "urn:adaptivx:concept:modelversion:1.0"
+                                    }
+                                ]
+                            }
                         },
                         {
                             "modelType": "Property",
                             "idShort": "FMUVersion",
                             "valueType": "xs:string",
-                            "value": "bearing_wear-fmi2.0"
+                            "value": "bearing_wear-fmi2.0",
+                            "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                    {
+                                        "type": "GlobalReference",
+                                        "value": "urn:adaptivx:concept:fmuversion:1.0"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "modelType": "Property",
+                            "idShort": "DetectedPattern",
+                            "valueType": "xs:string",
+                            "value": "normal",
+                            "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                    {
+                                        "type": "GlobalReference",
+                                        "value": "urn:adaptivx:concept:detectedpattern:1.0"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "modelType": "Property",
+                            "idShort": "FusionMethod",
+                            "valueType": "xs:string",
+                            "value": "weighted_v1",
+                            "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                    {
+                                        "type": "GlobalReference",
+                                        "value": "urn:adaptivx:concept:fusionmethod:1.0"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "modelType": "Property",
+                            "idShort": "ConfidenceInterval",
+                            "valueType": "xs:string",
+                            "value": "\u00b10%",
+                            "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                    {
+                                        "type": "GlobalReference",
+                                        "value": "urn:adaptivx:concept:confidenceinterval:1.0"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "modelType": "Property",
+                            "idShort": "FMUResidual",
+                            "valueType": "xs:double",
+                            "value": "0.0",
+                            "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                    {
+                                        "type": "GlobalReference",
+                                        "value": "urn:adaptivx:concept:fmuresidual:1.0"
+                                    }
+                                ]
+                            }
                         }
                     ]
                 }
-            ]
+            ],
+            "administration": {
+                "version": "1.1",
+                "revision": "0"
+            }
         },
         {
             "modelType": "Submodel",
@@ -151,25 +242,61 @@
                             "modelType": "Property",
                             "idShort": "SurfaceFinishGrade",
                             "valueType": "xs:string",
-                            "value": "A"
+                            "value": "A",
+                            "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                    {
+                                        "type": "GlobalReference",
+                                        "value": "urn:adaptivx:concept:surfacefinishgrade:1.0"
+                                    }
+                                ]
+                            }
                         },
                         {
                             "modelType": "Property",
                             "idShort": "ToleranceClass",
                             "valueType": "xs:string",
-                            "value": "±0.02mm"
+                            "value": "\u00b10.02mm",
+                            "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                    {
+                                        "type": "GlobalReference",
+                                        "value": "0173-1#02-AAE583#006"
+                                    }
+                                ]
+                            }
                         },
                         {
                             "modelType": "Property",
                             "idShort": "AssuranceState",
                             "valueType": "xs:string",
-                            "value": "assured"
+                            "value": "assured",
+                            "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                    {
+                                        "type": "GlobalReference",
+                                        "value": "urn:adaptivx:concept:assurancestate:1.0"
+                                    }
+                                ]
+                            }
                         },
                         {
                             "modelType": "Property",
                             "idShort": "EnergyCostPerPart_kWh",
                             "valueType": "xs:double",
-                            "value": "0.90"
+                            "value": "0.90",
+                            "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                    {
+                                        "type": "GlobalReference",
+                                        "value": "0173-1#02-AAT812#001"
+                                    }
+                                ]
+                            }
                         },
                         {
                             "modelType": "SubmodelElementCollection",
@@ -210,10 +337,59 @@
                                     }
                                 }
                             ]
+                        },
+                        {
+                            "modelType": "Property",
+                            "idShort": "CarbonFootprintGPerPart",
+                            "valueType": "xs:double",
+                            "value": "95.0",
+                            "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                    {
+                                        "type": "GlobalReference",
+                                        "value": "urn:adaptivx:concept:carbonfootprint:1.0"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "modelType": "Property",
+                            "idShort": "MaxSpindleSpeed_rpm",
+                            "valueType": "xs:int",
+                            "value": "24000",
+                            "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                    {
+                                        "type": "GlobalReference",
+                                        "value": "urn:adaptivx:concept:maxspindlespeed:1.0"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "modelType": "Property",
+                            "idShort": "MaxFeedRate_mmPerMin",
+                            "valueType": "xs:int",
+                            "value": "15000",
+                            "semanticId": {
+                                "type": "ExternalReference",
+                                "keys": [
+                                    {
+                                        "type": "GlobalReference",
+                                        "value": "urn:adaptivx:concept:maxfeedrate:1.0"
+                                    }
+                                ]
+                            }
                         }
                     ]
                 }
-            ]
+            ],
+            "administration": {
+                "version": "1.1",
+                "revision": "0"
+            }
         },
         {
             "modelType": "Submodel",

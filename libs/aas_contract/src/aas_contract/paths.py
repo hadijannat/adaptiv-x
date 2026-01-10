@@ -14,6 +14,12 @@ HEALTH_ELEMENT_PATHS = {
     "physics_residual": "PhysicsResidual",
     "last_update": "LastUpdate",
     "decision_rationale": "ExplainabilityBundle.DecisionRationale",
+    "detected_pattern": "ExplainabilityBundle.DetectedPattern",
+    "fusion_method": "ExplainabilityBundle.FusionMethod",
+    "confidence_interval": "ExplainabilityBundle.ConfidenceInterval",
+    "fmu_residual": "ExplainabilityBundle.FMUResidual",
+    "model_version": "ExplainabilityBundle.ModelVersion",
+    "fmu_version": "ExplainabilityBundle.FMUVersion",
 }
 
 CAPABILITY_ELEMENT_PATHS = {
@@ -21,6 +27,7 @@ CAPABILITY_ELEMENT_PATHS = {
     "surface_finish": "Capabilities/ProcessCapability:Milling/SurfaceFinishGrade",
     "tolerance_class": "Capabilities/ProcessCapability:Milling/ToleranceClass",
     "energy_cost": "Capabilities/ProcessCapability:Milling/EnergyCostPerPart_kWh",
+    "carbon_footprint": "Capabilities/ProcessCapability:Milling/CarbonFootprintGPerPart",
 }
 
 
