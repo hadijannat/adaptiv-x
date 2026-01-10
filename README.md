@@ -13,6 +13,7 @@ This implementation treats the Asset Administration Shell (AAS) not as a passive
 1. **Hybrid Detection** (Data + Physics): ML detects anomalies in vibration, then an FMU simulation validates whether the anomaly is plausible wear or sensor noise.
 2. **Semantic Reasoning**: The twin updates Capability descriptions (assurance state, quality level, energy cost) in its AAS representation.
 3. **Capability-Based Dispatch**: A production broker queries for "assured capability" and automatically reroutes jobs when capability degrades.
+4. **Event-Driven Updates**: Capability changes are published over MQTT and consumed by the dispatcher for fast rerouting.
 
 ## Architecture
 
@@ -93,6 +94,28 @@ cd adaptiv-x
 ./scripts/run_demo.sh
 ```
 
+### Secure Mode (OIDC)
+
+Adaptiv-X ships with an optional secure profile that enables JWT validation for all APIs and protects privileged endpoints.
+
+```bash
+# Start secure profile (includes Keycloak)
+docker compose -f deploy/compose/docker-compose.yml -f deploy/compose/docker-compose.secure.yml up
+```
+
+Defaults created by the secure profile:
+
+| Item | Value |
+| --- | --- |
+| Keycloak URL | `http://localhost:8088` |
+| Realm | `adaptivx` |
+| Client | `adaptivx-services` |
+| Client Secret | `adaptivx-secret` |
+| Demo User | `demo-admin` / `demo-admin` |
+| Privileged Role | `demo-admin` |
+
+Services read auth configuration from environment variables (see `deploy/compose/.env.example`).
+
 ### Running Services Individually
 
 ```bash
@@ -120,6 +143,7 @@ poetry run uvicorn fault_injector.main:app --reload --port 8004
 # dashboard
 cd dashboard
 npm install
+cp .env.example .env
 npm run dev
 ```
 
@@ -137,8 +161,9 @@ npm run dev
 | Submodel Registry | `4002` | Submodel descriptors |
 | Mosquitto MQTT | `1883` | TCP |
 | Mosquitto WebSockets | `9883` | MQTT over WS |
-| MinIO S3 | `9000` | Docker Compose default |
-| MinIO Console | `9001` | Docker Compose default |
+| MinIO S3 | `9010` | Docker Compose host port |
+| MinIO Console | `9011` | Docker Compose host port |
+| Keycloak | `8088` | Secure profile only |
 
 If ports are already in use, Docker may remap host ports (check `docker ps`).
 
@@ -193,6 +218,14 @@ Continuously updated by `adaptiv-monitor`:
 - `AnomalyScore` (0-1): ML-detected anomaly level
 - `PhysicsResidual` (0-1): FMU simulation deviation
 - `LastUpdate`: Timestamp of last assessment
+- `ExplainabilityBundle`:
+  - `DecisionRationale`
+  - `DetectedPattern`
+  - `FusionMethod`
+  - `ConfidenceInterval`
+  - `FMUResidual`
+  - `ModelVersion`
+  - `FMUVersion`
 
 ### Capability Submodel (Custom Draft)
 
@@ -203,6 +236,7 @@ Managed by `skill-broker`:
   - `ToleranceClass`: Precision specification
   - `AssuranceState`: assured | offered | notAvailable
   - `EnergyCostPerPart_kWh`: Dynamic energy cost
+  - `CarbonFootprintGPerPart`: Estimated footprint per part
   - `Evidence`: Links to Health and SimulationModels
 
 ### SimulationModels Submodel (IDTA 02005)
@@ -210,6 +244,11 @@ Managed by `skill-broker`:
 Standard-compliant FMU reference:
 
 - `ModelFileVersion` → `DigitalFile`: URL to FMU in MinIO
+
+## Documentation
+
+- Capability schema: `docs/semantics/capability-schema.md`
+- Decision rationale semantics: `docs/trust/decision-rationale.md`
 
 ## Contributing
 
